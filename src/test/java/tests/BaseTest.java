@@ -20,8 +20,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class BaseTest {
+    // objects
     WebDriver driver;
     TasksPage tp;
+
+    // variables
+    String tabId = "";
+    String tabName = "";
+
     @BeforeClass
     public void setup() throws InterruptedException {
         ChromeDriverManager.getInstance(DriverManagerType.CHROME).setup();
