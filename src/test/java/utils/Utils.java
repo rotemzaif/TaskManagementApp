@@ -43,6 +43,13 @@ public class Utils {
         return value;
     }
 
+
+    /**
+     * @description a methods which gets and reads an excel file sheet
+     * @param filePath
+     * @param sheetName
+     * @return data object[][] - which is actually the sheet data
+     */
     public static Object[][] getDataFromExcel(String filePath, String sheetName) {
         Object[][] data = null;
         try {
@@ -73,6 +80,13 @@ public class Utils {
         return data;
     }
 
+
+    /**
+     * a method which gets a cell and returns its value
+     * @param rowNum - int
+     * @param colNUm - int
+     * @return - string - cell value
+     */
     public static String getCellValue(int rowNum, int colNUm){
         Cell = ExcelWSheet.getRow(rowNum).getCell(colNUm);
         Cell.setCellType(CellType.STRING);
