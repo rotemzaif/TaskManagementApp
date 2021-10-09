@@ -6,27 +6,40 @@ package pageObjects;
 public class Task {
     // properties
     private String taskPriority;
-    private String taskDueDate;
+    private String taskDueDateIn;
+    private String dueDateTitle;
+    private String dueDateText;
     private String taskName;
     private String taskNotes;
     private String taskTags;
 
     // constructor
-    public Task(String taskPriority, String taskDueDate, String taskName, String taskNotes, String taskTags) {
+    public Task(String taskPriority, String taskDueDateIn, String dueDateTitle, String dueDateText, String taskName, String taskNotes, String taskTags) {
         this.taskPriority = taskPriority;
-        this.taskDueDate = taskDueDate;
+        this.taskDueDateIn = taskDueDateIn;
+        this.dueDateTitle = dueDateTitle;
+        this.dueDateText = dueDateText;
         this.taskName = taskName;
         this.taskNotes = taskNotes;
         this.taskTags = taskTags;
     }
 
     // getters
+
     public String getTaskPriority() {
         return taskPriority;
     }
 
-    public String getTaskDueDate() {
-        return taskDueDate;
+    public String getTaskDueDateIn() {
+        return taskDueDateIn;
+    }
+
+    public String getDueDateTitle() {
+        return dueDateTitle;
+    }
+
+    public String getDueDateText() {
+        return dueDateText;
     }
 
     public String getTaskName() {
@@ -40,5 +53,4 @@ public class Task {
     public String getTaskTags() {
         return taskTags;
     }
-
 }
