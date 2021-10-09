@@ -9,9 +9,7 @@ public class TabActions extends BaseTest {
     TasksPage tp;
 
     // variables
-    String tabName = "rzf - new tab test";
     String tabRaname = "rzf - tab rename test";
-    String tabId = "";
     int numOfTabBefore = 0;
 
     @Test(description = "cancel create new tab and verify num of tabs in the visible tab list stays the same")
@@ -19,6 +17,7 @@ public class TabActions extends BaseTest {
         tp = new TasksPage(driver);
         // getting num of tabs before the action
         numOfTabBefore = tp.getTabList().size();
+        tabName = "rzf - new tab test";
         tp.createNewTab(tabName,"cancel");
         // getting num of tabs after the action
         int numOfTabsAfter = tp.getTabList().size();
