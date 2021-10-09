@@ -1,5 +1,8 @@
 package pageObjects;
 
+/**
+ * Task class is used for creating and testing new and existing tasks
+ */
 public class Task {
     // properties
     private String taskPriority;
