@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,6 @@ import java.util.Map;
  * It has separated methods for actions and validations for each page section (i.e. tabs, tasks)
  */
 public class TasksPage extends BasePage{
-    // properties
-
-
-
     // page elements
     @FindBy(css = ".topblock-title>h2")
     private WebElement pageLabel;
@@ -35,12 +32,22 @@ public class TasksPage extends BasePage{
     @FindBy(css = "#slmenucontainer > ul > li")
     private List<WebElement> tabsSelectList;
 
+    // tasks elements
+    @FindBy(css = "#task")
+    WebElement simpleTaskEditBox;
+    @FindBy(css = "#newtask_submit")
+    WebElement simpleTaskAddBtn;
+    @FindBy(css = "#tasklist > li")
+    List<WebElement> taskElementList;
+    @FindBy(css = "#total")
+    WebElement tasksTotal;
+
     // constructor //
     public TasksPage(WebDriver driver) {
         super(driver);
     }
 
-    // page getters //
+    // tab getters //
 
     public List<WebElement> getTabList(){
         return tabList;
@@ -92,6 +99,27 @@ public class TasksPage extends BasePage{
         return tabName;
     }
 
+    /**
+     * this checks which sort option is selected and returns its name/description
+     * @param tabId - string
+     * @return selectedOption - string
+     */
+    public String getTabSortOption(String tabId){
+        String selectedOption = "";
+        goToTabById(tabId);
+        click(tabActionListBtn);
+        for (WebElement op : tabActionList) {
+            if(op.getAttribute("class").contains("sort") &&
+                    op.getAttribute("class").contains("checked")){
+                selectedOption = getText(op);
+                if(!selectedOption.equals("Sort by hand"))
+                    selectedOption = selectedOption.substring(0, selectedOption.length()-1).trim();
+                break;
+            }
+        }
+        return selectedOption;
+    }
+
     // tab action methods //
     /**
      * function that creates a new tab
@@ -138,14 +166,6 @@ public class TasksPage extends BasePage{
         click(getTabsFromListMap().get(tabIdInList));
         WebElement tab = getTabsMap().get(tabId);
         tabActionListBtn = tab.findElement(By.cssSelector(".list-action"));
-    }
-
-    public void printTabActionList(String tabid){
-        goToTabById(tabid);
-        click(tabActionListBtn);
-        for (WebElement op : tabActionList) {
-            System.out.println(getText(op));
-        }
     }
 
     /**
@@ -211,6 +231,59 @@ public class TasksPage extends BasePage{
         loading();
     }
 
+    /**
+     * this method moves to the desired tab and sets its sort display according to param
+     * @param tabId
+     * @param sortOption
+     */
+    public boolean setTabSortDisplay(String tabId, String sortOption) {
+        boolean optionFound = false;
+        goToTabById(tabId);
+        click(tabActionListBtn);
+        for (WebElement op : tabActionList) {
+            if(getText(op).equals(sortOption)){
+                optionFound = true;
+                if(!op.getAttribute("class").contains("checked"))
+                    click(op);
+                break;
+            }
+        }
+        return optionFound;
+    }
+
+    /**
+     * this method sets the tab 'Show completed tasks' state according to param
+     * @param tabId - string
+     * @param state - string - indicates select/un-select option
+     */
+    public boolean setTabcompletedTasksDisplay(String tabId, String state){
+        boolean optionFound = false;
+        String option = "Show completed tasks";
+        goToTabById(tabId);
+        loading();
+        click(tabActionListBtn);
+        for (WebElement op : tabActionList) {
+            if(getText(op).equals(option)){
+                optionFound = true;
+                if(state.equals("select")){
+                    if(!op.getAttribute("class").contains("checked")){
+                        click(op);
+                        loading();
+                        break;
+                    }
+                }
+                else if(state.equals("un-select")){
+                    if(op.getAttribute("class").contains("checked")){
+                        click(op);
+                        loading();
+                        break;
+                    }
+                }
+            }
+        }
+        return optionFound;
+    }
+
     // tab validation methods //
     /**
      * @description validation method which indicates if a tab exist or not in the visible tab list given tabid
@@ -241,6 +314,92 @@ public class TasksPage extends BasePage{
     public boolean isTabVisible(String tabId){
         return getTabsMap().get(tabId).isDisplayed();
     }
+
+    /**
+     * this method checks if a tab 'Show completed tasks' option is checked or not
+     * @param tabId - string
+     * @return boolean true/false if option is checked or not
+     */
+    public boolean isTabCompletedTasksChecked(String tabId){
+        String option = "Show completed tasks";
+        boolean result = false;
+        goToTabById(tabId);
+        click(tabActionListBtn);
+        for (WebElement op : tabActionList) {
+            if(getText(op).equals(op)){
+                if(op.getAttribute("class").contains("checked"))
+                    result = true;
+                break;
+            }
+        }
+        click(tabActionListBtn);
+        return result;
+    }
+
+    // tasks getters
+    public List<Task> getTasksList(){
+        List<Task> taskList = new ArrayList<>();
+        String priority, dueDateTitle, dueDateText,taskName, taskNote, taskTag;
+        for (WebElement taskrow : taskElementList) {
+            // checking if task is simple; i.e. simple task class name length is 8 characters and priority is 0
+            if(taskrow.getAttribute("class").length() < 10 && getText(taskrow.findElement(By.cssSelector(".task-prio"))).equals("0")){
+                priority = "";
+                dueDateTitle = "";
+                dueDateText = "";
+                taskName = getText(taskrow.findElement(By.cssSelector(".task-title")));
+                taskNote = "";
+                taskTag = "";
+            }
+            else { // task class name length >= 10 --> detailed task
+                // task priority init
+                priority = taskrow.findElement(By.cssSelector(".task-prio")).getAttribute("innerHTML");
+                // due dates fields init
+                if(taskrow.findElements(By.cssSelector(".task-through-right > span")).size() > 1){
+                    dueDateTitle = taskrow.findElement(By.cssSelector(".duedate")).getAttribute("title");
+                    dueDateText = getText(taskrow.findElement(By.cssSelector(".duedate")));
+                }
+                else{
+                    dueDateTitle = "";
+                    dueDateText = "";
+                }
+                // task name init
+                taskName = getText(taskrow.findElement(By.cssSelector(".task-title")));
+                // task note init
+                if(taskrow.getAttribute("class").contains("has-note")) // checking if task has a note
+                    taskNote = getText(taskrow.findElement(By.cssSelector(".task-note > span")));
+                else
+                    taskNote = "";
+                // task tag init
+                if(taskrow.getAttribute("class").contains("tag")) // checking if task has a tag
+                    taskTag = getText(taskrow.findElement(By.cssSelector(".task-tags")));
+                else
+                    taskTag = "";
+            }
+            taskList.add(new Task(priority, null, dueDateTitle, dueDateText, taskName, taskNote, taskTag));
+        }
+        return taskList;
+    }
+
+    public int getTotalTasksDisplay(){
+        String total = getText(tasksTotal);
+        return Integer.parseInt(total);
+    }
+
+    public String getTaskName(int taskIndex){
+        return getTasksList().get(taskIndex).getTaskName();
+    }
+
+    // tasks action methods
+    public void addNewSimpleTask(Task task) {
+        fillText(simpleTaskEditBox, task.getTaskName());
+        click(simpleTaskAddBtn);
+        loading();
+    }
+
+    // tasks validation methods
+
+
+
 
 //    public boolean isTabExistByName(String tabName){
 //        boolean result = false;
