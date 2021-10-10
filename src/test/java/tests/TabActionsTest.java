@@ -49,7 +49,7 @@ public class TabActionsTest extends BaseTest {
     public void tc05_rename_tab_cancel(){
         tp = new TasksPage(driver);
         tp.renameTab(tabId, "cancel", tabRaname);
-        String actualTabName = tp.getTabName(tabId);
+        String actualTabName = tp.getTabNameById(tabId);
         Assert.assertEquals(actualTabName, tabName);
     }
 
@@ -57,7 +57,7 @@ public class TabActionsTest extends BaseTest {
     public void tc06_rename_tab_accept(){
         tp = new TasksPage(driver);
         tp.renameTab(tabId, "accept", tabRaname);
-        String actualTabName = tp.getTabName(tabId);
+        String actualTabName = tp.getTabNameById(tabId);
         Assert.assertEquals(actualTabName, tabRaname);
     }
 
