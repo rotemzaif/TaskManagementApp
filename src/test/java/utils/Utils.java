@@ -1,9 +1,9 @@
 package utils;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,9 +16,9 @@ import java.util.Properties;
 public class Utils {
     // objects
     private static FileInputStream fis;
-    private static HSSFWorkbook ExcelWBook;
-    private static HSSFSheet ExcelWSheet;
-    private static HSSFCell Cell;
+    private static XSSFWorkbook ExcelWBook;
+    private static XSSFSheet ExcelWSheet;
+    private static XSSFCell Cell;
 
     // variables
 
@@ -55,7 +55,7 @@ public class Utils {
         try {
             fis = new FileInputStream(filePath);
             // Access the required test data sheet
-            ExcelWBook = new HSSFWorkbook(fis);
+            ExcelWBook = new XSSFWorkbook(fis);
             ExcelWSheet = ExcelWBook.getSheet(sheetName);
             int startRow = 1;
             int startCol = 0;
