@@ -41,6 +41,10 @@ public class TasksPage extends BasePage{
     List<WebElement> taskElementList;
     @FindBy(css = "#total")
     WebElement tasksTotal;
+    @FindBy(css = "#newtask_adv")
+    WebElement advancedBtn;
+    @FindBy(css = "#tagcloudbtn")
+    WebElement tagsBtn;
 
     // constructor //
     public TasksPage(WebDriver driver) {
@@ -385,15 +389,47 @@ public class TasksPage extends BasePage{
         return Integer.parseInt(total);
     }
 
+    /**
+     * @description this method gets a taskList index and returns the task's name in that index
+     * @param taskIndex - String
+     * @return taskName - String
+     */
     public String getTaskName(int taskIndex){
         return getTasksList().get(taskIndex).getTaskName();
     }
 
+    /**
+     * @description this extracts all tag elements, extracts their name and add it to a list
+     * @return List<String> tag names
+     */
+    public List<String> getTags(){
+        click(tagsBtn);
+        sleep(200);
+        List<WebElement> tagElList = driver.findElements(By.cssSelector("#tagcloudcontent > a"));
+        List<String> tagList = new ArrayList<>();
+        String tagName = "";
+        for (WebElement el : tagElList) {
+            tagName = getText(el);
+            tagList.add(tagName);
+        }
+        return tagList;
+    }
+
     // tasks action methods
+
+    /**
+     * @descrition this method gets a Task object as a param, enters the task name in the simple task edit
+     * box and clicks on the 'add task' button
+     * @param task
+     */
     public void addNewSimpleTask(Task task) {
         fillText(simpleTaskEditBox, task.getTaskName());
         click(simpleTaskAddBtn);
         loading();
+    }
+
+    public void goToAdvancedPage(){
+        click(advancedBtn);
     }
 
     // tasks validation methods
