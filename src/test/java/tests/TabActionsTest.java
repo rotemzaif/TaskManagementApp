@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.TasksPage;
 
-public class TabActions extends BaseTest {
+public class TabActionsTest extends BaseTest {
     // objects
     TasksPage tp;
 
