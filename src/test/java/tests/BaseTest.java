@@ -37,7 +37,7 @@ public class BaseTest {
         driver.get(Utils.readProperty("homePageURL"));
         tp = new TasksPage(driver);
         Thread.sleep(500);
-        String expectedPageTitle = tp.getFirstTabName() + " " + Utils.readProperty("pageTitle");
+        String expectedPageTitle = tp.getCurrentTabName() + " " + Utils.readProperty("pageTitle");
         String actualPageTitle = driver.getTitle();
         Assert.assertEquals(actualPageTitle, expectedPageTitle, "'" + expectedPageTitle + "' page is not displayed");
     }
