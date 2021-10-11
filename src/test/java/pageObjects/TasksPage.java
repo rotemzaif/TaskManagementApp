@@ -85,19 +85,20 @@ public class TasksPage extends BasePage{
      * @param tabId - string - the tab id we want to get its name
      * @return - string - the tab name
      */
-    public String getTabName(String tabId){
+    public String getTabNameById(String tabId){
         return getText(getTabsMap().get(tabId).findElement(By.cssSelector("a>span")));
     }
 
     /**
-     * this method runs over the tab list and finds the first selected tab; for page title validation test
-     * @return - string - tab name
+     * @description this method iterates on all tabs and checks which tab is currently selected and returns its name
+     * @return - tab name - String
      */
-    public String getFirstTabName(){
+    public String getCurrentTabName(){
         String tabName = "";
         for (WebElement tab : tabList) {
             if(tab.getAttribute("class").contains("selected")){
-                tabName = getText(tab.findElement(By.cssSelector("a>span")));
+                tabName = getText(tab.findElement(By.cssSelector("a > span")));
+                break;
             }
         }
         return tabName;
