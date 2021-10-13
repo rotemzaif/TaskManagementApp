@@ -18,6 +18,8 @@ public class TasksPage extends BasePage{
     // page elements
     @FindBy(css = ".topblock-title>h2")
     private WebElement pageLabel;
+    @FindBy(css = "#settings")
+    private WebElement settingsLink;
 
     // tab elements
     @FindBy(css = ".mtt-tabs-add-button")
@@ -55,6 +57,25 @@ public class TasksPage extends BasePage{
 
     public List<WebElement> getTabList(){
         return tabList;
+    }
+
+    /**
+     * @description this method iterates on each tab, checks if it matches the tab name parameter;
+     * if it matches, it gets its ID and adds it to the list
+     * @param tabName
+     * @return List<Integer> of tab index in the tab list
+     */
+    public List<String> getTabIdListForName(String tabName){
+        String name,tabId;
+        List<String> tabIdList = new ArrayList<>();
+        for (int i = 0; i < tabList.size(); i++) {
+            name = getText(tabList.get(i).findElement(By.cssSelector("a>span")));
+            if(name.equals(tabName)){
+                tabId = tabList.get(i).getAttribute("id");
+                tabIdList.add(tabId);
+            }
+        }
+        return tabIdList;
     }
 
     public List<WebElement> getTabsSelectList(){
@@ -105,6 +126,21 @@ public class TasksPage extends BasePage{
     }
 
     /**
+     * this method checks which is tab is currently selected and returns its ID
+     * @return - tabId - String
+     */
+    public String getCurrentTabId(){
+        String tabId = "";
+        for (WebElement tab : tabList) {
+            if(tab.getAttribute("class").contains("selected")){
+                tabId = tab.getAttribute("id");
+                break;
+            }
+        }
+        return tabId;
+    }
+
+    /**
      * this checks which sort option is selected and returns its name/description
      * @param tabId - string
      * @return selectedOption - string
@@ -134,7 +170,6 @@ public class TasksPage extends BasePage{
      */
     public String createNewTab(String tabName, String state){
         String tabId = "";
-        String selectListTabId = "";
         click(newTabBtn);
         allertSendText(tabName);
         if(state.equals("accept")){
@@ -250,6 +285,7 @@ public class TasksPage extends BasePage{
                 optionFound = true;
                 if(!op.getAttribute("class").contains("checked"))
                     click(op);
+                else click(tabActionListBtn);
                 break;
             }
         }
@@ -261,11 +297,10 @@ public class TasksPage extends BasePage{
      * @param tabId - string
      * @param state - string - indicates select/un-select option
      */
-    public boolean setTabcompletedTasksDisplay(String tabId, String state){
+    public boolean setTabCompletedTasksDisplay(String tabId, String state){
         boolean optionFound = false;
         String option = "Show completed tasks";
         goToTabById(tabId);
-        loading();
         click(tabActionListBtn);
         for (WebElement op : tabActionList) {
             if(getText(op).equals(option)){
@@ -276,6 +311,7 @@ public class TasksPage extends BasePage{
                         loading();
                         break;
                     }
+                    else click(tabActionListBtn);
                 }
                 else if(state.equals("un-select")){
                     if(op.getAttribute("class").contains("checked")){
@@ -283,6 +319,7 @@ public class TasksPage extends BasePage{
                         loading();
                         break;
                     }
+                    else click(tabActionListBtn);
                 }
             }
         }
@@ -433,19 +470,14 @@ public class TasksPage extends BasePage{
         click(advancedBtn);
     }
 
+    // other actions
+    public void goToSettingsPage(){
+        click(settingsLink);
+    }
+
     // tasks validation methods
+    public boolean isAdvancedBtnDisplayed(){
+        return advancedBtn.isDisplayed();
+    }
 
-
-
-
-//    public boolean isTabExistByName(String tabName){
-//        boolean result = false;
-//        for (WebElement tab : tabList) {
-//            if(getText(tab.findElement(By.cssSelector("a>span"))).equals(tabName)){
-//                result = true;
-//                break;
-//            }
-//        }
-//        return result;
-//    }
 }
