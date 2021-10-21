@@ -1,5 +1,7 @@
 package pageObjects;
 
+import java.util.List;
+
 /**
  * Task class is used for creating and testing new and existing tasks
  */
@@ -11,17 +13,17 @@ public class Task {
     private String dueDateText;
     private String taskName;
     private String taskNotes;
-    private String taskTags;
+    private List<String> taskTagsList;
 
     // constructor
-    public Task(String taskPriority, String taskDueDateIn, String dueDateTitle, String dueDateText, String taskName, String taskNotes, String taskTags) {
+    public Task(String taskPriority, String taskDueDateIn, String dueDateTitle, String dueDateText, String taskName, String taskNotes, List<String> taskTagsList) {
         this.taskPriority = taskPriority;
         this.taskDueDateIn = taskDueDateIn;
         this.dueDateTitle = dueDateTitle;
         this.dueDateText = dueDateText;
         this.taskName = taskName;
         this.taskNotes = taskNotes;
-        this.taskTags = taskTags;
+        this.taskTagsList = taskTagsList;
     }
 
     // getters
@@ -50,7 +52,7 @@ public class Task {
         return taskNotes;
     }
 
-    public String getTaskTags() {
-        return taskTags;
+    public List<String> getTaskTagsList() {
+        return taskTagsList;
     }
 }
