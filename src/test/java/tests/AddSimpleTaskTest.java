@@ -41,7 +41,7 @@ public class AddSimpleTaskTest extends BaseTest {
     public void tc03_set_tab_display_unselect_completed_tasks(){
         tp = new TasksPage(driver);
         totalTaskDisplay = tp.getTotalTasksDisplay();
-        if(tp.setTabcompletedTasksDisplay(tabId, "un-select"))
+        if(tp.setTabCompletedTasksDisplay(tabId, "un-select"))
             Assert.assertFalse(tp.isTabCompletedTasksChecked(tabId), "'Show completed tasks' option is un-selected");
         else
             Assert.fail("'Show completed tasks'" + " options was not found in the tab action list");
@@ -51,7 +51,7 @@ public class AddSimpleTaskTest extends BaseTest {
     public void tc04_create_multiple_simple_tasks(String taskName){
         tp = new TasksPage(driver);
         totalTasksInList = tp.getTasksList().size();
-        task = new Task(null, null, null, null, taskName, null, null);
+        task = new Task(null, null, null, taskName, null, null);
         tp.addNewSimpleTask(task);
         tasksCounter++;
         int actualTasksInList = tp.getTasksList().size();
