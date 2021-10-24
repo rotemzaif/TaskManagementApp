@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,23 +35,28 @@ public class TasksPage extends BasePage{
     @FindBy(css = "#slmenucontainer > ul > li")
     private List<WebElement> tabsSelectList;
 
-    // tasks elements
+    // create task elements
     @FindBy(css = "#task")
-    WebElement simpleTaskEditBox;
+    private WebElement simpleTaskEditBox;
     @FindBy(css = "#newtask_submit")
-    WebElement simpleTaskAddBtn;
-    @FindBy(css = "#tasklist > li")
-    List<WebElement> taskElementList;
-    @FindBy(css = "#total")
-    WebElement tasksTotal;
+    private WebElement simpleTaskAddBtn;
     @FindBy(css = "#newtask_adv")
-    WebElement advancedBtn;
+    private WebElement advancedBtn;
+
+    // task list elements
+    @FindBy(css = "#tasklist > li")
+    private List<WebElement> taskElementList;
+    @FindBy(css = "#total")
+    private WebElement tasksTotal;
+
+    // other elements
     @FindBy(css = "#tagcloudbtn")
     WebElement tagsBtn;
 
     // constructor //
     public TasksPage(WebDriver driver) {
         super(driver);
+        wait.until(ExpectedConditions.visibilityOfAllElements(tasksTotal));
     }
 
     // tab getters //
@@ -381,43 +387,54 @@ public class TasksPage extends BasePage{
     // tasks getters
     public List<Task> getTasksList(){
         List<Task> taskList = new ArrayList<>();
-        String priority, dueDateTitle, dueDateText,taskName, taskNote, taskTag;
+        String priority, dueDateText,taskName, note, taskTags;
+        WebElement taskPriorityEl, taskNameEl;
+        List<WebElement> taskTagListEl = new ArrayList<>();
         for (WebElement taskrow : taskElementList) {
+            // task elements
+            taskPriorityEl = taskrow.findElement(By.cssSelector(".task-prio"));
+            taskNameEl = taskrow.findElement(By.cssSelector(".task-title"));
+            // local variables for creating a task
+            priority = "";
+            dueDateText = "";
+            note = "";
+            taskTags = "";
             // checking if task is simple; i.e. simple task class name length is 8 characters and priority is 0
-            if(taskrow.getAttribute("class").length() < 10 && getText(taskrow.findElement(By.cssSelector(".task-prio"))).equals("0")){
-                priority = "";
-                dueDateTitle = "";
-                dueDateText = "";
-                taskName = getText(taskrow.findElement(By.cssSelector(".task-title")));
-                taskNote = "";
-                taskTag = "";
-            }
-            else { // task class name length >= 10 --> detailed task
+            if(taskrow.getAttribute("class").length() < 10 && getText(taskPriorityEl).equals("0"))
+                taskName = getText(taskNameEl);
+            // task class name length >= 10 --> detailed task
+            else {
                 // task priority init
-                priority = taskrow.findElement(By.cssSelector(".task-prio")).getAttribute("innerHTML");
+                priority = taskPriorityEl.getAttribute("innerHTML");
                 // due dates fields init
-                if(taskrow.findElements(By.cssSelector(".task-through-right > span")).size() > 1){
-                    dueDateTitle = taskrow.findElement(By.cssSelector(".duedate")).getAttribute("title");
+                if(taskrow.getAttribute("class").contains("past") || taskrow.getAttribute("class").contains("today") ||
+                        taskrow.getAttribute("class").contains("future") ||
+                        taskrow.getAttribute("class").contains("soon"))
                     dueDateText = getText(taskrow.findElement(By.cssSelector(".duedate")));
-                }
-                else{
-                    dueDateTitle = "";
+                else
                     dueDateText = "";
-                }
                 // task name init
-                taskName = getText(taskrow.findElement(By.cssSelector(".task-title")));
+                taskName = getText(taskNameEl);
                 // task note init
                 if(taskrow.getAttribute("class").contains("has-note")) // checking if task has a note
-                    taskNote = getText(taskrow.findElement(By.cssSelector(".task-note > span")));
+                    note = taskrow.findElement(By.cssSelector(".task-note > span")).getAttribute("innerHTML");
                 else
-                    taskNote = "";
+                    note = "";
                 // task tag init
-                if(taskrow.getAttribute("class").contains("tag")) // checking if task has a tag
-                    taskTag = getText(taskrow.findElement(By.cssSelector(".task-tags")));
+                // checking if task has a tag
+                if(taskrow.getAttribute("class").contains("tag")){
+                    taskTagListEl = taskrow.findElements(By.cssSelector(".task-tags > a"));
+                    for (int i = 0; i < taskTagListEl.size(); i++) {
+                        if(i != taskTagListEl.size()-1)
+                            taskTags = taskTags + getText(taskTagListEl.get(i)) + ", ";
+                        else
+                            taskTags = taskTags + getText(taskTagListEl.get(i));
+                    }
+                }
                 else
-                    taskTag = "";
+                    taskTags = "";
             }
-            taskList.add(new Task(priority, null, dueDateTitle, dueDateText, taskName, taskNote, taskTag));
+            taskList.add(new Task(priority, null, dueDateText, taskName, note, taskTags));
         }
         return taskList;
     }
@@ -479,5 +496,4 @@ public class TasksPage extends BasePage{
     public boolean isAdvancedBtnDisplayed(){
         return advancedBtn.isDisplayed();
     }
-
 }
