@@ -52,6 +52,9 @@ public class TasksPage extends BasePage{
     // other elements
     @FindBy(css = "#tagcloudbtn")
     WebElement tagsBtn;
+    @FindBy(css = "#search")
+    WebElement searchBox;
+
 
     // constructor //
     public TasksPage(WebDriver driver) {
@@ -485,6 +488,10 @@ public class TasksPage extends BasePage{
 
     public void goToAdvancedPage(){
         click(advancedBtn);
+    }
+
+    public void serachText(String keyword){
+        fillText(searchBox, keyword);
     }
 
     // other actions
