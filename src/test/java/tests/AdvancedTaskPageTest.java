@@ -90,7 +90,7 @@ public class AdvancedTaskPageTest extends BaseTest {
     }
 
     @Test(description = "verifying that total num of tasks displayed has not changed after canceling task submit in Advanced Task page")
-    public void tc06_verify_total_num_of_tasks_displayed_after_cancel(){
+    public void tc07_verify_total_num_of_tasks_displayed_after_cancel(){
         tp = new TasksPage(driver);
         int actualTotalNumOfTaskDisplayed = tp.getTotalTasksDisplay();
         Assert.assertEquals(actualTotalNumOfTaskDisplayed, numOfTasksDisplayedBefore, "num of tasks displayed has changed although " +
