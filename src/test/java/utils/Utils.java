@@ -2,6 +2,7 @@ package utils;
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -19,6 +20,7 @@ public class Utils {
     private static XSSFWorkbook ExcelWBook;
     private static XSSFSheet ExcelWSheet;
     private static XSSFCell Cell;
+    private static XSSFRow Row;
 
     // variables
 
@@ -60,8 +62,8 @@ public class Utils {
             int startRow = 1;
             int startCol = 0;
             int totRows = ExcelWSheet.getLastRowNum();
-            org.apache.poi.ss.usermodel.Row r = ExcelWSheet.getRow(0);
-            int totCols = r.getLastCellNum();
+            Row = ExcelWSheet.getRow(0);
+            int totCols = Row.getLastCellNum();
             data = new Object[totRows][totCols];
             int di = 0;
             for (int i = startRow; i <= totRows; di++,i++) {
