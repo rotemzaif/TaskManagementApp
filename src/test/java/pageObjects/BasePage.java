@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -28,7 +29,7 @@ public class BasePage {
         PageFactory.initElements(driver,this);
         actions = new Actions(driver);
         js = (JavascriptExecutor) driver;
-        wait = new WebDriverWait(driver,15);
+        wait = new WebDriverWait(driver,30);
     }
 
     // elements actions
@@ -97,5 +98,15 @@ public class BasePage {
     public void loading(){
         wait.until(ExpectedConditions.visibilityOf(loading));
         wait.until(ExpectedConditions.invisibilityOf(loading));
+    }
+
+    public void waitForLoad(WebDriver driver) {
+        ExpectedCondition<Boolean> pageLoadCondition = new
+                ExpectedCondition<Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        return js.executeScript("return document.readyState").equals("complete");
+                    }
+                };
+        wait.until(pageLoadCondition);
     }
 }
