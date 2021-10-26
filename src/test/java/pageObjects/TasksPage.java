@@ -54,12 +54,15 @@ public class TasksPage extends BasePage{
     WebElement tagsBtn;
     @FindBy(css = "#search")
     WebElement searchBox;
+    @FindBy(css = "#search_close")
+    WebElement searchClose;
 
 
     // constructor //
     public TasksPage(WebDriver driver) {
         super(driver);
         wait.until(ExpectedConditions.visibilityOfAllElements(tasksTotal));
+//        wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
     }
 
     // tab getters //
@@ -200,6 +203,7 @@ public class TasksPage extends BasePage{
     public void goToTabById(String tabId){
         WebElement tab = getTabsMap().get(tabId);
         click(tab);
+        loading();
         tabActionListBtn = tab.findElement(By.cssSelector(".list-action"));
     }
 
@@ -490,8 +494,16 @@ public class TasksPage extends BasePage{
         click(advancedBtn);
     }
 
-    public void serachText(String keyword){
+    public void searchText(String keyword){
         fillText(searchBox, keyword);
+        loading();
+        wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
+    }
+
+    public void closeSearch(){
+        click(searchClose);
+        loading();
+        wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
     }
 
     // other actions
