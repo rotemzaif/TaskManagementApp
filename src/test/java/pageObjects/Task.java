@@ -72,4 +72,15 @@ public class Task {
         }
         return taskTagsMap;
     }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "taskPriority='" + taskPriority + '\'' +
+                ", dueDateText='" + dueDateText + '\'' +
+                ", taskName='" + taskName + '\'' +
+                ", taskNotes='" + taskNotes + '\'' +
+                ", taskTagsString='" + taskTagsString + '\'' +
+                '}';
+    }
 }
