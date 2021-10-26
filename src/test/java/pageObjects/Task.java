@@ -17,7 +17,7 @@ public class Task {
 
     // constructor
     public Task(String taskPriority, String taskDueDateIn, String dueDateText, String taskName, String taskNotes, String taskTags) {
-        if(taskPriority.isEmpty())
+        if(taskPriority == null || taskPriority.isEmpty())
             this.taskPriority = "0";
         else this.taskPriority = taskPriority;
         this.taskDueDateIn = taskDueDateIn;
@@ -25,13 +25,14 @@ public class Task {
         this.taskName = taskName;
         this.taskNotes = taskNotes;
         this.taskTagsString = taskTags;
-        if(taskTags.contains(",")){
-            taskTags = taskTags.replaceAll(" ", "");
-            this.taskTagsList = Arrays.asList(taskTags.split(","));
+        if(taskTags != null){
+            if(taskTags.contains(",")){
+                taskTags = taskTags.replaceAll(" ", "");
+                this.taskTagsList = Arrays.asList(taskTags.split(","));
+            }
+            else
+                this.taskTagsList.add(taskTags);
         }
-        else
-            this.taskTagsList.add(taskTags);
-
     }
 
     // getters
