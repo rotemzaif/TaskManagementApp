@@ -18,7 +18,7 @@ public class SearchTaskTest extends BaseTest {
     @Test(description = "creating a new tab for testing text search in the task list")
     public void tc01_create_new_tab_for_testing() {
         tp = new TasksPage(driver);
-        tabId = tp.createNewTab(tabName, "accept");
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         tp = new TasksPage(driver);
         Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list");
     }
@@ -64,7 +64,7 @@ public class SearchTaskTest extends BaseTest {
         tp.closeSearch();
         tp = new TasksPage(driver);
         Assert.assertEquals(tp.getTasksList().size(), getTasksToEnterList().size(), "closing the text search doesn't display the original task list\n");
-        Assert.assertEquals(tp.getTotalTasksDisplay(), getTasksToEnterList().size(), "incorrect total tasks display after closing the text search");
+        Assert.assertEquals(tp.getTotalTasksDisplay(), getTasksToEnterList().size(), "incorrect total tasks display after closing the text search\n");
     }
 
     public List<Task> getTasksToEnterList(){
