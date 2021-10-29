@@ -18,21 +18,25 @@ public class TabActionsTest extends BaseTest {
         // getting num of visible tabs before the action
         numOfTabBefore = tp.getTabList().size();
         tabName = "rzf - new tab test";
-        tp.createNewTab(tabName, TasksPage.AlertState.CANCEL);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.CANCEL,"", null);
+        if(tabId != null)
+            Assert.fail("tab is created although canceling tab creation action\n");
         // getting num of visible tabs after the action
         int numOfTabsAfter = tp.getTabList().size();
         int actualNumOfTabsInSelectList = tp.getTabsSelectList().size()-2;
-        Assert.assertEquals(numOfTabsAfter, numOfTabBefore, "check if tab was created although tab creation action was canceled");
-        Assert.assertEquals(actualNumOfTabsInSelectList, numOfTabBefore, "check if tab was added in the Select list menu although tab creation action was canceled");
+        Assert.assertEquals(numOfTabsAfter, numOfTabBefore, "check if tab was created although tab creation action was canceled\n");
+        Assert.assertEquals(actualNumOfTabsInSelectList, numOfTabBefore, "check if tab was added in the Select list menu although tab creation action was canceled\n");
     }
 
     @Test(description = "create a new tab and verify it was created and added in the visible tab list and in the TabSelectList")
     public void tc02_create_new_tab(){
         tp = new TasksPage(driver);
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT,"", null);
         tp = new TasksPage(driver);
-        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list");
-        Assert.assertTrue(tp.isTabExistInSelectList(tabId), "the new tab was not added in the 'Select list' menu");
+        if(tabId.isEmpty())
+            Assert.fail("failed to create a tab for testing");
+        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "tab id: '" + tabId + "' is created but not visible\n");
+        Assert.assertTrue(tp.isTabExistInSelectList(tabId), "tab id: '" + tabId + "' was not added in the 'Select list' menu");
     }
 
     @Test(description = "cancel tab rename action and verify tab name didn't change")
