@@ -15,40 +15,25 @@ public class AddSimpleTaskTest extends BaseTest {
     int totalTaskDisplay = 0;
     int totalTasksInList = 0;
 
-    @Test(description = "creating a new tab for testing simple tasks addition")
+    @Test(description = "creating a new tab for testing simple tasks and setting tab sort display to 'Sort by hand' and un-selecting 'Show completed tasks'")
     public void tc01_create_new_tab_for_testing(){
         tp = new TasksPage(driver);
         tabName = "rzf - tasks";
-        tabId = tp.createNewTab(tabName, "accept");
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         tp = new TasksPage(driver);
-        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list");
-    }
-
-    @Test(description = "set tab sort display to 'sort by hand' and verify it is selected")
-    public void tc02_set_tab_display_select_sort_by_hand(){
-        tp = new TasksPage(driver);
+        // verifying tab is created
+        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list\n");
+        // setting tab sort display to 'Sort by hand' and verifying it is selected/checked
         String sortOption = "Sort by hand";
-        if(tp.setTabSortDisplay(tabId, sortOption)){
-            String actualSelectedOption = tp.getTabSortOption(tabId);
-            Assert.assertEquals(actualSelectedOption, sortOption, sortOption + " is not selected\n");
-        }
-        else {
-            Assert.fail("'" + sortOption + "'" + " was not found in the tab action list");
-        }
-    }
-
-    @Test(description = "un-select 'Show completed tasks' option and verify it is unselected")
-    public void tc03_set_tab_display_unselect_completed_tasks(){
-        tp = new TasksPage(driver);
-        totalTaskDisplay = tp.getTotalTasksDisplay();
-        if(tp.setTabCompletedTasksDisplay(tabId, "un-select"))
-            Assert.assertFalse(tp.isTabCompletedTasksChecked(tabId), "'Show completed tasks' option is un-selected");
-        else
-            Assert.fail("'Show completed tasks'" + " options was not found in the tab action list");
+        if(!tp.setTabSortDisplay(tabId, sortOption))
+            Assert.fail("'" + sortOption + "' was not found in the tab action menu list!\n");
+        // setting tab 'Show completed  tasks' to un-select and verifying it is not selected
+        if(!tp.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT))
+            Assert.fail("'Show completed tasks' option was not found in the tab action menu list!\n");
     }
 
     @Test(dataProvider = "getSimpleTasksData", description = "create multiple simple tasks and verify each new task is added in the list and its name")
-    public void tc04_create_multiple_simple_tasks(String taskName){
+    public void tc03_create_multiple_simple_tasks(String taskName){
         tp = new TasksPage(driver);
         totalTasksInList = tp.getTasksList().size();
         task = new Task(null, null, null, taskName, null, null);
@@ -61,7 +46,7 @@ public class AddSimpleTaskTest extends BaseTest {
     }
 
     @Test(description = "verify total num of tasks display")
-    public void tc05_verify_total_num_of_tasks_display(){
+    public void tc04_verify_total_num_of_tasks_display(){
         tp = new TasksPage(driver);
         int actualNumOfTaskDisplay = tp.getTotalTasksDisplay();
         Assert.assertEquals(actualNumOfTaskDisplay, totalTaskDisplay + tasksCounter, "total num of tasks displayed doesn't match actual num of tasks in the list");
