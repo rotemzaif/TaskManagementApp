@@ -18,9 +18,12 @@ public class SearchTaskTest extends BaseTest {
     @Test(description = "creating a new tab for testing text search in the task list")
     public void tc01_create_new_tab_for_testing() {
         tp = new TasksPage(driver);
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT, "Sort by hand", TasksPage.OptionState.UNSELECT);
         tp = new TasksPage(driver);
-        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list");
+        // verifying tab is created
+        if(tabId.isEmpty())
+            Assert.fail("failed to create a tab for testing");
+        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "tab id: \" + tabId + \" is created but not visible\\n");
     }
 
 
