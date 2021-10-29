@@ -7,6 +7,8 @@ import pageObjects.Task;
 import pageObjects.TasksPage;
 import utils.Utils;
 
+import java.util.List;
+
 public class AddSimpleTaskTest extends BaseTest {
     // test global objects
     Task task;
@@ -19,17 +21,22 @@ public class AddSimpleTaskTest extends BaseTest {
     public void tc01_create_new_tab_for_testing(){
         tp = new TasksPage(driver);
         tabName = "rzf - tasks";
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
+        List<String> tabsIdWithSameName = tp.getTabIdListForName(tabName, TasksPage.SearchType.EQUAL);
+        // checking if there are tabs with the same name; if there are, selecting the 1st one and setting its sort display
+        if(tabsIdWithSameName.size() > 0){
+            tabId = tabsIdWithSameName.get(0);
+            tp.setTabSortDisplay(tabId, "Sort by hand");
+            tp.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT);
+        }
+        // there are no tabs with name 'rzf - tasks' --> creating a new tab + setting view settings
+        else
+            tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT, "Sort by hand", TasksPage.OptionState.UNSELECT);
         tp = new TasksPage(driver);
         // verifying tab is created
-        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "the tab was not created or added to the visible tab list\n");
-        // setting tab sort display to 'Sort by hand' and verifying it is selected/checked
-        String sortOption = "Sort by hand";
-        if(!tp.setTabSortDisplay(tabId, sortOption))
-            Assert.fail("'" + sortOption + "' was not found in the tab action menu list!\n");
-        // setting tab 'Show completed  tasks' to un-select and verifying it is not selected
-        if(!tp.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT))
-            Assert.fail("'Show completed tasks' option was not found in the tab action menu list!\n");
+        if(tabId.isEmpty())
+            Assert.fail("failed to create a tab for testing");
+        totalTaskDisplay = tp.getTotalTasksDisplay();
+        Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "tab id: " + tabId + " is created but not visible\\n");
     }
 
     @Test(dataProvider = "getSimpleTasksData", description = "create multiple simple tasks and verify each new task is added in the list and its name")
