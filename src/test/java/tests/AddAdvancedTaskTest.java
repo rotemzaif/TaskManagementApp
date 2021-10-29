@@ -51,10 +51,8 @@ public class AddAdvancedTaskTest extends BaseTest {
                 Assert.fail("failed to delete tabs with same name");
         }
         // if there is no tab with tabName, create a new tab and set its display settings
-        else if(tabsWithSameName.isEmpty())
-            tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
-        tp.setTabSortDisplay(tabId,"Sort by hand");
-        tp.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT);
+        else
+            tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT, "Sort by hand", TasksPage.OptionState.UNSELECT);
         Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "failed to retrieve a tab for testing!!\n");
     }
 
