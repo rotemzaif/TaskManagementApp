@@ -1,8 +1,5 @@
 package tests;
 
-import com.sun.xml.internal.bind.v2.TODO;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -36,28 +33,28 @@ public class AddAdvancedTaskTest extends BaseTest {
             "if there are no tabs with that name, create a new tab with that name and set its sort option and un-select 'Show completed tasks")
     public void tc01_check_for_existing_testing_tab() {
         tp = new TasksPage(driver);
-        List<String> tabsWithSameName = tp.getTabIdListForName(tabName);
+        List<String> tabsWithSameName = tp.getTabIdListForName(tabName, TasksPage.SearchType.EQUAL);
         // if there is one tab with tabName, get its id
         if(tabsWithSameName.size() == 1)
-            tabId = tp.getTabIdListForName(tabName).get(0);
+            tabId = tabsWithSameName.get(0);
         // if there multiple tabs with the sane tabName, delete all tabs except the first
         else if(tabsWithSameName.size() > 1){
             String id;
             for (int i = tabsWithSameName.size()-1; i > 0 ; i--) {
                 id = tabsWithSameName.get(i);
-                tp.deleteTabById(id, "accept");
+                tp.deleteTabById(id, TasksPage.AlertState.ACCEPT);
             }
-            tabsWithSameName = tp.getTabIdListForName(tabName);
+            tabsWithSameName = tp.getTabIdListForName(tabName, TasksPage.SearchType.EQUAL);
             if(tabsWithSameName.size() == 1)
-                tabId = tp.getTabIdListForName(tabName).get(0);
+                tabId = tabsWithSameName.get(0);
             else
                 Assert.fail("failed to delete tabs with same name");
         }
         // if there is no tab with tabName, create a new tab and set its display settings
         else if(tabsWithSameName.isEmpty())
-            tabId = tp.createNewTab(tabName, "accept");
+            tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         tp.setTabSortDisplay(tabId,"Sort by hand");
-        tp.setTabCompletedTasksDisplay(tabId, "un-select");
+        tp.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT);
         Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "failed to retrieve a tab for testing!!\n");
     }
 
