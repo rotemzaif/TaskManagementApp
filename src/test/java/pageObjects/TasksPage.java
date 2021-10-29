@@ -195,21 +195,33 @@ public class TasksPage extends BasePage {
     // tab action methods //
 
     /**
-     * function that creates a new tab
-     *
-     * @param tabName - string - tab name to enter
-     * @param state   - string - indicates whether to accept or cancel the allert
-     * @return - string - tab id - in case of 'accept' and null in case of 'cancel'
+     * @description method that creates a new tab (or cancels), sets tab sort option according to arg entered, and select/un-select
+     * 'Show completed tasks' according to state arg entered
+     * @param tabName - String
+     * @param allertState - enum ACCPET/CANCEL
+     * @param sortOption - String
+     * @param sctSate - enum SELECT/UNSELECT, sct - show completed tasks
+     * @return tabId - new tab Id - String
      */
-    public String createNewTab(String tabName, AlertState state) {
+    public String createNewTab(String tabName, AlertState allertState, String sortOption, OptionState sctSate){
         String tabId = "";
         click(newTabBtn);
         allertSendText(tabName);
-        if (state == AlertState.ACCEPT) {
+        if (allertState == AlertState.ACCEPT) {
             allertAccept();
             loading();
             tabId = tabList.get(tabList.size() - 1).getAttribute("id");
-        } else if (state == AlertState.CANCEL) {
+            // set tab sort display
+            if(!sortOption.isEmpty()){
+                if(!setTabSortDisplay(tabId, sortOption))
+                    System.out.println("'" + sortOption + "' was not found in the tab action menu list!\n");
+            }
+            // set tab 'show completed tasks' state - select/un-select
+            if(sctSate != null){
+                if(!setTabCompletedTasksDisplay(tabId, sctSate))
+                    System.out.println("'Show completed tasks' option was not found in the tab action menu list!\n");
+            }
+        } else if (allertState == AlertState.CANCEL) {
             allertcancel();
             tabId = null;
         }
@@ -551,7 +563,7 @@ public class TasksPage extends BasePage {
     }
 
     public enum SearchType {
-        CONTAINS, EQUAL;
+        CONTAINS, EQUAL, ;
     }
 
     public enum OptionState {
