@@ -53,7 +53,7 @@ public class SearchTaskTest extends BaseTest {
         if(actualListAfterSearch.isEmpty())
             Assert.fail("Failed to detect tasks with keyword '" + textToSearch + "'\n");
         Assert.assertEquals(actualListAfterSearch.size(), expectedTaskList.size(), "not all tasks with keyword '" + textToSearch + "' are displayed\n");
-        int actualTotalTasksDisplay = tp.getTotalTasksDisplay();
+        int actualTotalTasksDisplay = tp.getTotalTasksDisplayVal();
         Assert.assertEquals(actualTotalTasksDisplay, expectedTaskList.size(), "incorrect total num of tasks display");
         for (Task task : actualListAfterSearch) {
             if(!task.getTaskName().contains(textToSearch) && !task.getTaskNotes().contains(textToSearch))
@@ -67,7 +67,7 @@ public class SearchTaskTest extends BaseTest {
         tp.closeSearch();
         tp = new TasksPage(driver);
         Assert.assertEquals(tp.getTasksList().size(), getTasksToEnterList().size(), "closing the text search doesn't display the original task list\n");
-        Assert.assertEquals(tp.getTotalTasksDisplay(), getTasksToEnterList().size(), "incorrect total tasks display after closing the text search\n");
+        Assert.assertEquals(tp.getTotalTasksDisplayVal(), getTasksToEnterList().size(), "incorrect total tasks display after closing the text search\n");
     }
 
     public List<Task> getTasksToEnterList(){
