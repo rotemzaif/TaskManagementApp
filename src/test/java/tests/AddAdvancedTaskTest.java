@@ -25,7 +25,7 @@ public class AddAdvancedTaskTest extends BaseTest {
     int totTasksDisplayBefore = 0;
     int counter = 0;
     Map<String, String> advancedTaskPriorityMap = new HashMap<>();
-    Task task;
+    Task enteredTask;
     String shortDateformat = "";
     String shortDateCurrentYearFormat = "";
 
@@ -79,7 +79,7 @@ public class AddAdvancedTaskTest extends BaseTest {
     public void tc03_go_to_advanced_task_page(){
         tp = new TasksPage(driver);
         numOfTasksInListBefore = tp.getTasksList().size();
-        totTasksDisplayBefore = tp.getTotalTasksDisplay();
+        totTasksDisplayBefore = tp.getTotalTasksDisplayVal();
         tp.goToAdvancedPage();
         atp = new AdvancedTaskPage(driver);
         if(atp.isPageDisPlayed(atp.getNewTaskLabel()))
@@ -96,47 +96,17 @@ public class AddAdvancedTaskTest extends BaseTest {
         }
         atp = new AdvancedTaskPage(driver);
         // adding the new advanced task
-        task = new Task(priorityIn, dueDateIn,null,nameIn, noteIn, tagsIn);
-        atp.submitTask(task);
+        enteredTask = new Task(priorityIn, dueDateIn,null,nameIn, noteIn, tagsIn);
+        atp.submitTask(enteredTask);
         counter++;
         tp = new TasksPage(driver);
         // checking if task was added to list - by checking the actual number of tasks in the list
         int actualNumOfTasksInList = tp.getTasksList().size();
         Assert.assertEquals(actualNumOfTasksInList, numOfTasksInListBefore+counter, "number of tasks in list didn't change after submitting " +
-                "task: " + task.getTaskName() + "\n");
-        // verifying added task details match the details entered
+                "task: " + enteredTask.getTaskName() + "\n");
+        // verifying that added task details match the details entered
         Task addedTask = tp.getTasksList().get(tp.getTasksList().size()-1);
-        // checking task details - priorityIn
-        String expectedPriorityValDisplay = "";
-        if(priorityIn.isEmpty())
-            expectedPriorityValDisplay = advancedTaskPriorityMap.get("0");
-        else
-            expectedPriorityValDisplay = advancedTaskPriorityMap.get(priorityIn);
-        String actualPriorityValDisplay = addedTask.getTaskPriority();
-        Assert.assertEquals(actualPriorityValDisplay, expectedPriorityValDisplay, "Actual task priority doesn't match the priority entered\n");
-        // checking task details - due date
-        String expectedDueDateValDisplay = DateAnalysis.getExpectedDateDisplay(dueDateIn, shortDateformat, shortDateCurrentYearFormat);
-        String actaulDueDateValDisplay = addedTask.getDueDateText();
-        Assert.assertEquals(actaulDueDateValDisplay, expectedDueDateValDisplay, "Actual task due date value doesn't match the due date entered");
-        // checking task details - name
-        String actualTaskName = addedTask.getTaskName();
-        Assert.assertEquals(actualTaskName, nameIn, "Actual task name doesn't match the name entered");
-        // checking task details - notes
-        String actualTaskNote = addedTask.getTaskNotes();
-        Assert.assertEquals(actualTaskNote, noteIn, "Actual task note doesn't match the note entered");
-        // checking task details - tags
-        tagsIn = tagsIn.replaceAll(" ","");
-        List<String> enteredTagsList = Arrays.asList(tagsIn.split(","));
-        Map<String,String> actualTaskTagsMap = addedTask.getTaskTagsMap();
-        // checking num of actual tags vs. num of entered tags
-        Assert.assertEquals(actualTaskTagsMap.size(), enteredTagsList.size(),"Actual task number of tags doesn't match the number of tags entered!!");
-        // checking if tags are identical
-        for (String tag : enteredTagsList) {
-            if(!actualTaskTagsMap.containsKey(tag)){
-                Assert.fail("actual task doesn't include the entered tag: " + tag);
-                break;
-            }
-        }
+        Assert.assertTrue(tp.compareTasks(addedTask, enteredTask, advancedTaskPriorityMap, shortDateformat, shortDateCurrentYearFormat), "one or more task details don't match!! View logs or console messages for more details");
     }
 
     @Test
@@ -146,7 +116,7 @@ public class AddAdvancedTaskTest extends BaseTest {
         if(!tp.getCurrentTabId().equals(tabId))
             tp.goToTabById(tabId);
         // get actual num of tasks display
-        int actualTotNumOfTaskDisplay = tp.getTotalTasksDisplay();
+        int actualTotNumOfTaskDisplay = tp.getTotalTasksDisplayVal();
         Assert.assertEquals(actualTotNumOfTaskDisplay, totTasksDisplayBefore + counter, "Total number of tasks displayed doesn't match " +
                 "the number of tasks in the list");
     }
