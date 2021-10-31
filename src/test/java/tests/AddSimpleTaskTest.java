@@ -35,7 +35,7 @@ public class AddSimpleTaskTest extends BaseTest {
         // verifying tab is created
         if(tabId.isEmpty())
             Assert.fail("failed to create a tab for testing");
-        totalTaskDisplay = tp.getTotalTasksDisplay();
+        totalTaskDisplay = tp.getTotalTasksDisplayVal();
         Assert.assertTrue(tp.isTabExistInVisibleList(tabId), "tab id: " + tabId + " is created but not visible\\n");
     }
 
@@ -55,7 +55,7 @@ public class AddSimpleTaskTest extends BaseTest {
     @Test(description = "verify total num of tasks display")
     public void tc04_verify_total_num_of_tasks_display(){
         tp = new TasksPage(driver);
-        int actualNumOfTaskDisplay = tp.getTotalTasksDisplay();
+        int actualNumOfTaskDisplay = tp.getTotalTasksDisplayVal();
         Assert.assertEquals(actualNumOfTaskDisplay, totalTaskDisplay + tasksCounter, "total num of tasks displayed doesn't match actual num of tasks in the list");
     }
 
