@@ -17,6 +17,8 @@ public class AdvancedTaskPage extends BasePage {
     // page tasks elements
     @FindBy(css = "#page_taskedit > .mtt-inadd")
     private WebElement newTaskLabel;
+    @FindBy(css = "#page_taskedit > .mtt-inedit")
+    private WebElement editTaskLabel;
     @FindBy(css = "[name='prio']")
     private WebElement priorityEl;
     private Select prioritySel;
@@ -65,6 +67,10 @@ public class AdvancedTaskPage extends BasePage {
         return newTaskLabel;
     }
 
+    public WebElement getEditTaskLabel() {
+        return editTaskLabel;
+    }
+
     public String getPriorityVal() {
         return getText(prioritySel.getFirstSelectedOption());
     }
@@ -96,11 +102,16 @@ public class AdvancedTaskPage extends BasePage {
 
     // tasks action methods //
     public void submitTask(Task task) {
-        selectPriority(task.getTaskPriority());
-        enterDueDate(task.getTaskDueDateIn());
-        enterTaskName(task.getTaskName());
-        enterTaskNote(task.getTaskNotes());
-        enterTaskTag(task.getTaskTagsString());
+        if(!task.getTaskPriority().isEmpty() || task.getTaskPriority() != null)
+            selectPriority(task.getTaskPriority());
+        if(!task.getTaskDueDateIn().isEmpty() || task.getTaskDueDateIn() != null)
+            enterDueDate(task.getTaskDueDateIn());
+        if(!task.getTaskName().isEmpty() || task.getTaskName() != null)
+            enterTaskName(task.getTaskName());
+        if(!task.getTaskNotes().isEmpty() || task.getTaskNotes() != null)
+            enterTaskNote(task.getTaskNotes());
+        if(!task.getTaskTagsString().isEmpty() || task.getTaskTagsString() != null)
+            enterTaskTag(task.getTaskTagsString());
         click(saveBtn);
     }
 
