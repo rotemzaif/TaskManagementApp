@@ -20,11 +20,19 @@ public class Task {
         if(taskPriority == null || taskPriority.isEmpty())
             this.taskPriority = "0";
         else this.taskPriority = taskPriority;
-        this.taskDueDateIn = taskDueDateIn;
+        if(taskDueDateIn == null)
+            this.taskDueDateIn = "";
+        else this.taskDueDateIn = taskDueDateIn;
         this.dueDateText = dueDateText;
-        this.taskName = taskName;
-        this.taskNotes = taskNotes;
-        this.taskTagsString = taskTags;
+        if(taskName == null)
+            this.taskName = "";
+        else this.taskName = taskName;
+        if(taskNotes == null)
+            this.taskNotes = "";
+        else this.taskNotes = taskNotes;
+        if(taskTags == null)
+            this.taskTagsString = "";
+        else this.taskTagsString = taskTags;
         if(taskTags != null){
             if(taskTags.contains(",")){
                 taskTags = taskTags.replaceAll(" ", "");
