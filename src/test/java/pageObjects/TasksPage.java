@@ -5,7 +5,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import utils.DateAnalysis;
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -49,6 +51,12 @@ public class TasksPage extends BasePage {
     private List<WebElement> taskElementList;
     @FindBy(css = "#total")
     private WebElement tasksTotal;
+    @FindBy(css = ".taskactionbtn")
+    private List<WebElement> taskActionBtnList;
+    @FindBy(css = "#taskcontextcontainer > ul > li")
+    private List<WebElement> taskActionListEl;
+    @FindBy(css = "#taskcontextcontainer")
+    private WebElement taskActionsMenu;
 
     // other elements
     @FindBy(css = "#tagcloudbtn")
@@ -434,6 +442,11 @@ public class TasksPage extends BasePage {
     }
 
     // tasks getters
+
+    public WebElement getTasksTotal() {
+        return tasksTotal;
+    }
+
     public List<Task> getTasksList() {
         List<Task> taskList = new ArrayList<>();
         String priority, dueDateText, taskName, note, taskTags;
@@ -487,7 +500,7 @@ public class TasksPage extends BasePage {
         return taskList;
     }
 
-    public int getTotalTasksDisplay() {
+    public int getTotalTasksDisplayVal() {
         String total = getText(tasksTotal);
         return Integer.parseInt(total);
     }
@@ -516,6 +529,40 @@ public class TasksPage extends BasePage {
             tagList.add(tagName);
         }
         return tagList;
+    }
+
+    /**
+     * @description method that returns the first simple/advanced task index from the tasklist
+     * @param taskType - SIMPLE/ADVANCED - enum
+     * @return taskId - String
+     */
+    public int getTaskIndex(TaskType taskType){
+        int taskIndex = 0;
+        for (WebElement taskrow : taskElementList) {
+            if(taskType == TaskType.SIMPLE){
+                if(taskrow.getAttribute("class").length() < 10){
+                    taskIndex = taskElementList.indexOf(taskrow);
+                    break;
+                }
+            }
+            else if(taskType == TaskType.ADVANCED){
+                if(taskrow.getAttribute("class").length() >= 10){
+                    taskIndex = taskElementList.indexOf(taskrow);
+                    break;
+                }
+            }
+        }
+        return taskIndex;
+    }
+
+    public Map<String, WebElement> getTaskActionMap(){
+        Map<String, WebElement> actions = new HashMap<>();
+        String actionName;
+        for (WebElement action : taskActionListEl) {
+            actionName = getText(action);
+            actions.put(actionName, action);
+        }
+        return actions;
     }
 
     // tasks action methods
@@ -547,6 +594,17 @@ public class TasksPage extends BasePage {
         wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
     }
 
+    public void openActionsMenu(int taskIndex){
+        WebElement taskActionBtn = taskActionBtnList.get(taskIndex);
+        moveTo(taskActionBtn);
+        sleep(200);
+        click(taskActionBtn);
+    }
+
+    public void taskEdit(){
+        click(getTaskActionMap().get("Edit"));
+    }
+
     // other actions
     public void goToSettingsPage() {
         click(settingsLink);
@@ -555,6 +613,61 @@ public class TasksPage extends BasePage {
     // tasks validation methods
     public boolean isAdvancedBtnDisplayed() {
         return advancedBtn.isDisplayed();
+    }
+
+    public boolean isTaskActionsMenuDisplayed(){
+        return taskActionsMenu.isDisplayed();
+    }
+
+    public boolean compareTasks(Task actual, Task expected, Map<String, String> advancedTaskPriorityMap, String shortDateformat, String shortDateCurrentYearFormat) throws ParseException {
+        boolean result = true;
+        // task priority compare
+        String expectedPrio = advancedTaskPriorityMap.get(expected.getTaskPriority());
+        if(!actual.getTaskPriority().equals(expectedPrio)){
+            System.out.println("actual task priority doesn't match expected task priority!!");
+            System.out.println("Expected: " + expectedPrio + "\nActual: " + actual.getTaskPriority());
+            result = false;
+        }
+        // due date text compare
+        String expectedDueDateValDisplay = DateAnalysis.getExpectedDateDisplay(expected.getTaskDueDateIn(), shortDateformat, shortDateCurrentYearFormat);
+        if(!actual.getDueDateText().equals(expectedDueDateValDisplay)){
+            System.out.println("actual task due date text doesn't match expected task due date!!");
+            System.out.println("Expected task due date inserted: " + expected.getTaskDueDateIn() + "\nExpected task due date text display: " + expectedDueDateValDisplay
+                    + "\nActual task due date text: " + actual.getTaskPriority());
+            result = false;
+        }
+        // task name compare
+        if(!actual.getTaskName().equals(expected.getTaskName())){
+            System.out.println("actual task name doesn't match expected task name!!");
+            System.out.println("actual task name: " + actual.getTaskName() + "\nExpected task name: " + expected.getTaskName());
+            result = false;
+        }
+        // task notes compare
+        if(!actual.getTaskNotes().equals(expected.getTaskNotes())){
+            System.out.println("actual task note doesn't match expected task note!!");
+            System.out.println("actual task name: " + actual.getTaskNotes() + "\nExpected task name: " + expected.getTaskNotes());
+            result = false;
+        }
+        // task tags compare
+        String expectedTaskTagString = expected.getTaskTagsString().replaceAll(" ", "");
+        List<String> expectedTagList = Arrays.asList(expectedTaskTagString.split(","));
+        Map<String,String> actualTaskTagsMap = actual.getTaskTagsMap();
+        if(actualTaskTagsMap.size() == expectedTagList.size()){
+            for (String tag : expected.getTaskTagsList()) {
+                if(!actualTaskTagsMap.containsKey(tag)){
+                    System.out.println("actual task doesn't include the entered tag: " + tag);
+                    result = false;
+                    break;
+                }
+            }
+        }
+        else{
+            System.out.println("Actual task number of tags doesn't match the number of tags entered!!");
+            System.out.println("actual task tags: " + actual.getTaskTagsList().toString());
+            System.out.println("expected task tags: " + expected.getTaskTagsList().toString());
+            result = false;
+        }
+        return result;
     }
 
     // enums
@@ -568,5 +681,9 @@ public class TasksPage extends BasePage {
 
     public enum OptionState {
         SELECT, UNSELECT;
+    }
+
+    public enum TaskType {
+        SIMPLE, ADVANCED;
     }
 }
