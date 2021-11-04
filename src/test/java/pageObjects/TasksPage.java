@@ -47,16 +47,34 @@ public class TasksPage extends BasePage {
     private WebElement advancedBtn;
 
     // task list elements
+    @FindBy(css = "#taskcontainer")
+    private WebElement taskListContainer;
     @FindBy(css = "#tasklist > li")
     private List<WebElement> taskElementList;
     @FindBy(css = "#total")
-    private WebElement tasksTotal;
+    private WebElement tasksTotalEl;
     @FindBy(css = ".taskactionbtn")
     private List<WebElement> taskActionBtnList;
     @FindBy(css = "#taskcontextcontainer > ul > li")
     private List<WebElement> taskActionListEl;
     @FindBy(css = "#taskcontextcontainer")
     private WebElement taskActionsMenu;
+    @FindBy(css = ".task-note-area")
+    private List<WebElement> taskNoteAreaListel;
+    @FindBy(css = "textarea")
+    private List<WebElement> taskNoteTextAreaListEl;
+    @FindBy(css = ".mtt-action-note-save")
+    private List<WebElement> taskNoteSaveBtnListEl;
+    @FindBy(css = ".mtt-action-note-cancel")
+    private List<WebElement> taskNoteCancelBtnListEl;
+    @FindBy(css = ".task-toggle")
+    private List<WebElement> taskToggleListel;
+    @FindBy(css = ".task-note")
+    private List<WebElement> taskNoteDisplayedListEl;
+    @FindBy(css = "#cmenupriocontainer>ul>li")
+    private List<WebElement> taskActionsPriorityListel;
+    @FindBy(css = "#cmenulistscontainer>ul>li")
+    private List<WebElement> taskActionsTabListel;
 
     // other elements
     @FindBy(css = "#tagcloudbtn")
@@ -66,12 +84,18 @@ public class TasksPage extends BasePage {
     @FindBy(css = "#search_close")
     WebElement searchClose;
 
+    // page properties
+    Map<String, WebElement> taskPriorityMap = new HashMap<>();
 
     // constructor //
     public TasksPage(WebDriver driver) {
         super(driver);
-        wait.until(ExpectedConditions.visibilityOfAllElements(tasksTotal));
-//        wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
+        wait.until(ExpectedConditions.visibilityOfAllElements(tasksTotalEl));
+        String key;
+        for (WebElement prio : taskActionsPriorityListel) {
+            key = prio.getAttribute("id").split(":")[1];
+            taskPriorityMap.put(key, prio);
+        }
     }
 
     // tab getters //
@@ -81,29 +105,27 @@ public class TasksPage extends BasePage {
     }
 
     /**
-     * @description this method iterates through the tab element list, checks if the tab name equals/contains the tab name arg;
-     * if it matches, it gets its ID and adds it to the list
-     * @param tabName - String
+     * @param tabName    - String
      * @param searchType - enum EQUALS/CONTAINS
      * @return List<Integer> of tab id
+     * @description this method iterates through the tab element list, checks if the tab name equals/contains the tab name arg;
+     * if it matches, it gets its ID and adds it to the list
      */
-    public List<String> getTabIdListForName(String tabName, SearchType searchType){
+    public List<String> getTabIdListForName(String tabName, SearchType searchType) {
         List<String> tabIdList = new ArrayList<>();
-        if(tabList.size() == tabNameListEl.size()){
+        if (tabList.size() == tabNameListEl.size()) {
             String name;
             for (int i = 0; i < tabList.size(); i++) {
                 name = getText(tabNameListEl.get(i));
-                if(searchType == SearchType.EQUAL){
-                    if(name.equals(tabName))
+                if (searchType == SearchType.EQUAL) {
+                    if (name.equals(tabName))
                         tabIdList.add(tabList.get(i).getAttribute("id"));
-                }
-                else if(searchType == SearchType.CONTAINS){
-                    if(name.contains(tabName))
+                } else if (searchType == SearchType.CONTAINS) {
+                    if (name.contains(tabName))
                         tabIdList.add(tabList.get(i).getAttribute("id"));
                 }
             }
-        }
-        else System.out.println("num of tabs names doesn't match num of visible tabs");
+        } else System.out.println("num of tabs names doesn't match num of visible tabs");
         return tabIdList;
     }
 
@@ -111,11 +133,14 @@ public class TasksPage extends BasePage {
         return tabsSelectList;
     }
 
+    /**
+     * @return - map of tab elements key = tabid, value = tab element based on visible tab list
+     */
     public Map<String, List<Object>> getTabsMap() {
         Map<String, List<Object>> tabsMap = new HashMap<>();
         String tabId, tabName;
         WebElement tabEl, tabActionsBtn;
-        if (tabList.size() == tabNameListEl.size() && tabList.size() == tabActionsBtnListEl.size()-1) {
+        if (tabList.size() == tabNameListEl.size() && tabList.size() == tabActionsBtnListEl.size() - 1) {
             for (int i = 0; i < tabList.size(); i++) {
                 tabId = tabList.get(i).getAttribute("id");
                 tabEl = tabList.get(i);
@@ -127,6 +152,9 @@ public class TasksPage extends BasePage {
         return tabsMap;
     }
 
+    /**
+     * @return - map of tab elements key = tabid, value = tab element based on tab list displayed in the tabs select element
+     */
     public Map<String, WebElement> getTabsFromListMap() {
         Map<String, WebElement> tabsSelectListMap = new HashMap<>();
         String key;
@@ -143,7 +171,6 @@ public class TasksPage extends BasePage {
      */
     public String getTabNameById(String tabId) {
         return (String) getTabsMap().get(tabId).get(1);
-//        return getText(getTabsMap().get(tabId).findElement(By.cssSelector("a>span")));
     }
 
     /**
@@ -203,15 +230,15 @@ public class TasksPage extends BasePage {
     // tab action methods //
 
     /**
+     * @param tabName     - String
+     * @param allertState - enum ACCPET/CANCEL
+     * @param sortOption  - String
+     * @param sctSate     - enum SELECT/UNSELECT, sct - show completed tasks
+     * @return tabId - new tab Id - String
      * @description method that creates a new tab (or cancels), sets tab sort option according to arg entered, and select/un-select
      * 'Show completed tasks' according to state arg entered
-     * @param tabName - String
-     * @param allertState - enum ACCPET/CANCEL
-     * @param sortOption - String
-     * @param sctSate - enum SELECT/UNSELECT, sct - show completed tasks
-     * @return tabId - new tab Id - String
      */
-    public String createNewTab(String tabName, AlertState allertState, String sortOption, OptionState sctSate){
+    public String createNewTab(String tabName, AlertState allertState, String sortOption, OptionState sctSate) {
         String tabId = "";
         click(newTabBtn);
         allertSendText(tabName);
@@ -220,13 +247,13 @@ public class TasksPage extends BasePage {
             loading();
             tabId = tabList.get(tabList.size() - 1).getAttribute("id");
             // set tab sort display
-            if(!sortOption.isEmpty()){
-                if(!setTabSortDisplay(tabId, sortOption))
+            if (!sortOption.isEmpty()) {
+                if (!setTabSortDisplay(tabId, sortOption))
                     System.out.println("'" + sortOption + "' was not found in the tab action menu list!\n");
             }
             // set tab 'show completed tasks' state - select/un-select
-            if(sctSate != null){
-                if(!setTabCompletedTasksDisplay(tabId, sctSate))
+            if (sctSate != null) {
+                if (!setTabCompletedTasksDisplay(tabId, sctSate))
                     System.out.println("'Show completed tasks' option was not found in the tab action menu list!\n");
             }
         } else if (allertState == AlertState.CANCEL) {
@@ -252,14 +279,14 @@ public class TasksPage extends BasePage {
      * @description this method opens the 'Select list' menu and clicks on the requested tab name
      */
     public void goToTabFromList(String tabId) {
-        String tabIdNum = tabId.split("_")[1];
-        String tabIdInList = "slmenu_list:" + tabIdNum;
+        String tabIdInList = "";
+        if (!tabId.contains("slmenu_list")) {
+            String tabIdNum = tabId.split("_")[1];
+            tabIdInList = "slmenu_list:" + tabIdNum;
+        } else tabIdInList = tabId;
         click(tabsSelectListBtn);
-        sleep(200);
+        wait.until(ExpectedConditions.elementToBeClickable(getTabsFromListMap().get(tabIdInList)));
         click(getTabsFromListMap().get(tabIdInList));
-        WebElement tab = (WebElement) getTabsMap().get(tabId).get(0);
-//        WebElement tab = getTabsMap().get(tabId);
-//        tabActionListBtn = tab.findElement(By.cssSelector(".list-action"));
     }
 
     /**
@@ -290,8 +317,8 @@ public class TasksPage extends BasePage {
     /**
      * this method opens the tab action list menu and selects the 'Rename list' option, enters the new tab name, and accepts/cancels
      *
-     * @param tabId   - string - the tab id in which we want to rename
-     * @param state   - string - indicates if we want accept or cancel the rename action
+     * @param tabId      - string - the tab id in which we want to rename
+     * @param state      - string - indicates if we want accept or cancel the rename action
      * @param tabNewName - string - the new tab name we want to enter
      */
     public void renameTab(String tabId, AlertState state, String tabNewName) {
@@ -332,13 +359,14 @@ public class TasksPage extends BasePage {
     }
 
     /**
-     * @description this method moves to the desired tab and sets its sort display according to param
-     * @param tabId - String
+     * @param tabId      - String
      * @param sortOption - String
+     * @description this method moves to the desired tab and sets its sort display according to param
      */
     public boolean setTabSortDisplay(String tabId, String sortOption) {
         boolean optionFound = false;
-        goToTabById(tabId);
+        if (!getCurrentTabId().equals(tabId))
+            goToTabById(tabId);
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
         click(tabActionsBtn);
         for (WebElement op : tabActionList) {
@@ -354,9 +382,9 @@ public class TasksPage extends BasePage {
     }
 
     /**
-     * @description this method sets the tab 'Show completed tasks' state according to param
      * @param tabId - string
      * @param state - string - indicates select/un-select option
+     * @description this method sets the tab 'Show completed tasks' state according to param
      */
     public boolean setTabCompletedTasksDisplay(String tabId, OptionState state) {
         boolean optionFound = false;
@@ -443,16 +471,24 @@ public class TasksPage extends BasePage {
 
     // tasks getters
 
-    public WebElement getTasksTotal() {
-        return tasksTotal;
+    /**
+     * @return - tasks total element
+     */
+    public WebElement getTasksTotalEl() {
+        return tasksTotalEl;
     }
 
+    /**
+     * @return a list of Task objects based on the tasks displayed in the list
+     */
     public List<Task> getTasksList() {
         List<Task> taskList = new ArrayList<>();
         String priority, dueDateText, taskName, note, taskTags;
         WebElement taskPriorityEl, taskNameEl;
         List<WebElement> taskTagListEl = new ArrayList<>();
+        String taskRowClassVal;
         for (WebElement taskrow : taskElementList) {
+            taskRowClassVal = taskrow.getAttribute("class");
             // task elements
             taskPriorityEl = taskrow.findElement(By.cssSelector(".task-prio"));
             taskNameEl = taskrow.findElement(By.cssSelector(".task-title"));
@@ -462,29 +498,28 @@ public class TasksPage extends BasePage {
             note = "";
             taskTags = "";
             // checking if task is simple; i.e. simple task class name length is 8 characters and priority is 0
-            if (taskrow.getAttribute("class").length() < 10 && getText(taskPriorityEl).equals("0"))
+            if (taskRowClassVal.length() < 10 && getText(taskPriorityEl).equals("0"))
                 taskName = getText(taskNameEl);
                 // task class name length >= 10 --> detailed task
             else {
                 // task priority init
                 priority = taskPriorityEl.getAttribute("innerHTML");
                 // due dates fields init
-                if (taskrow.getAttribute("class").contains("past") || taskrow.getAttribute("class").contains("today") ||
-                        taskrow.getAttribute("class").contains("future") ||
-                        taskrow.getAttribute("class").contains("soon"))
+                if (taskRowClassVal.contains("past") || taskRowClassVal.contains("today") || taskRowClassVal.contains("future") ||
+                        taskRowClassVal.contains("soon"))
                     dueDateText = getText(taskrow.findElement(By.cssSelector(".duedate")));
                 else
                     dueDateText = "";
                 // task name init
                 taskName = getText(taskNameEl);
                 // task note init
-                if (taskrow.getAttribute("class").contains("has-note")) // checking if task has a note
+                if (taskRowClassVal.contains("has-note")) // checking if task has a note
                     note = taskrow.findElement(By.cssSelector(".task-note > span")).getAttribute("innerHTML");
                 else
                     note = "";
                 // task tag init
                 // checking if task has a tag
-                if (taskrow.getAttribute("class").contains("tag")) {
+                if (taskRowClassVal.contains("tag")) {
                     taskTagListEl = taskrow.findElements(By.cssSelector(".task-tags > a"));
                     for (int i = 0; i < taskTagListEl.size(); i++) {
                         if (i != taskTagListEl.size() - 1)
@@ -500,8 +535,29 @@ public class TasksPage extends BasePage {
         return taskList;
     }
 
+    /**
+     * @param index - String - index of the task element in the task element list
+     * @return - taskId - String
+     */
+    public String getTaskId(int index){
+        return taskElementList.get(index).getAttribute("id");
+    }
+
+    /**
+     * @return - map of task elements; key = taskId, value = task element; based on task row element list
+     */
+    public Map<String, WebElement> getTasksMap(){
+        Map<String, WebElement> tasksMap = new HashMap<>();
+        String taskId;
+        for (WebElement task : taskElementList) {
+            taskId = task.getAttribute("id");
+            tasksMap.put(taskId, task);
+        }
+        return tasksMap;
+    }
+
     public int getTotalTasksDisplayVal() {
-        String total = getText(tasksTotal);
+        String total = getText(tasksTotalEl);
         return Integer.parseInt(total);
     }
 
@@ -532,22 +588,38 @@ public class TasksPage extends BasePage {
     }
 
     /**
-     * @description method that returns the first simple/advanced task index from the tasklist
      * @param taskType - SIMPLE/ADVANCED - enum
      * @return taskId - String
+     * @description method that returns the first simple/advanced task index from the tasklist
      */
-    public int getTaskIndex(TaskType taskType){
+    public int getTaskIndex(TaskType taskType, TaskAttribute attribute) {
         int taskIndex = 0;
+        String taskClass;
         for (WebElement taskrow : taskElementList) {
-            if(taskType == TaskType.SIMPLE){
-                if(taskrow.getAttribute("class").length() < 10){
+            taskClass = taskrow.getAttribute("class");
+            if (taskType == TaskType.SIMPLE) {
+                if (taskClass.length() < 10) {
                     taskIndex = taskElementList.indexOf(taskrow);
                     break;
                 }
-            }
-            else if(taskType == TaskType.ADVANCED){
-                if(taskrow.getAttribute("class").length() >= 10){
-                    taskIndex = taskElementList.indexOf(taskrow);
+            } else if (taskType == TaskType.ADVANCED) {
+                if (taskClass.length() >= 10) {
+                    if (attribute != null) {
+                        switch (attribute) {
+                            case DUEDATE:
+                                if (taskClass.contains("past") || taskClass.contains("future") || taskClass.contains("today") || taskClass.contains("soon"))
+                                    taskIndex = taskElementList.indexOf(taskrow);
+                                break;
+                            case NOTE:
+                                if (taskClass.contains("task-has-note"))
+                                    taskIndex = taskElementList.indexOf(taskrow);
+                                break;
+                            case TAGS:
+                                if (taskClass.contains("tag"))
+                                    taskIndex = taskElementList.indexOf(taskrow);
+                                break;
+                        }
+                    } else taskIndex = taskElementList.indexOf(taskrow);
                     break;
                 }
             }
@@ -555,7 +627,10 @@ public class TasksPage extends BasePage {
         return taskIndex;
     }
 
-    public Map<String, WebElement> getTaskActionMap(){
+    /**
+     * @return map of tasks actions where key = action name (string) and value = action (element)
+     */
+    public Map<String, WebElement> getTaskActionMap() {
         Map<String, WebElement> actions = new HashMap<>();
         String actionName;
         for (WebElement action : taskActionListEl) {
@@ -563,6 +638,15 @@ public class TasksPage extends BasePage {
             actions.put(actionName, action);
         }
         return actions;
+    }
+
+    public String getTaskDisplayedNoteText(int index) {
+        return getText(taskNoteDisplayedListEl.get(index));
+    }
+
+    public String getTaskPriorityValue(String key) {
+        WebElement priority = taskPriorityMap.get(key);
+        return priority.getAttribute("textContent");
     }
 
     // tasks action methods
@@ -585,7 +669,7 @@ public class TasksPage extends BasePage {
     public void searchText(String keyword) {
         fillText(searchBox, keyword);
         loading();
-        wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
+        wait.until(ExpectedConditions.visibilityOfAllElements(taskListContainer));
     }
 
     public void closeSearch() {
@@ -594,15 +678,94 @@ public class TasksPage extends BasePage {
         wait.until(ExpectedConditions.visibilityOfAllElements(taskElementList));
     }
 
-    public void openActionsMenu(int taskIndex){
-        WebElement taskActionBtn = taskActionBtnList.get(taskIndex);
+    /**
+     * @description - this method open the task actions menu (per task index) and clicks on the action per input
+     * @param index - int - task index - for selecting the right action menu from a list
+     * @param action - string - the action required
+     * @return - boolean - true/false if the action menu is opened and displayed
+     */
+    public boolean selectTaskAction(int index, String action) {
+        boolean menuOpened = true;
+        WebElement taskActionBtn = taskActionBtnList.get(index);
         moveTo(taskActionBtn);
-        sleep(200);
+        wait.until(ExpectedConditions.elementToBeClickable(taskActionBtn));
         click(taskActionBtn);
+        if (!isTaskActionsMenuDisplayed())
+            menuOpened = false;
+        else
+            click(getTaskActionMap().get(action));
+        return menuOpened;
     }
 
-    public void taskEdit(){
-        click(getTaskActionMap().get("Edit"));
+    /**
+     * this method is part of the task action 'edit nonte' flow which edits a new or existing task note
+     * @param index - int - task index in the list
+     * @param note - string - note text to enter
+     * @param action - enum - save or cancel
+     */
+    public void editTaskNote(int index, String note, TaskNoteConf action) {
+        WebElement noteTextArea = taskNoteTextAreaListEl.get(index);
+        WebElement saveBtn = taskNoteSaveBtnListEl.get(index);
+        WebElement cancelBtn = taskNoteCancelBtnListEl.get(index);
+        fillText(noteTextArea, note);
+        if (action == TaskNoteConf.SAVE) {
+            click(saveBtn);
+            loading();
+        } else if (action == TaskNoteConf.CANCEL)
+            click(cancelBtn);
+    }
+
+    /**
+     * this method refers to the toggle elements of the left side of the task row, which displays the task note text
+     * @param index - int - task index - for clicking on the right toggle element
+     * @param state - enum - open/close
+     */
+    public void toggleTaskNoteDisplay(int index, TaskNoteToggleState state) {
+        if (state == TaskNoteToggleState.OPEN) {
+            if (!isTaskNoteDisplayed(index)) // toggle state = closed --> then open
+                click(taskToggleListel.get(index));
+        } else if (state == TaskNoteToggleState.CLOSE) {
+            if (isTaskNoteDisplayed(index)) // toggle state = opened --> then close
+                click(taskToggleListel.get(index));
+        }
+
+    }
+
+    public void editTaskPriority(String priority) {
+        click(taskPriorityMap.get(priority));
+    }
+
+    /**
+     * this method is a part of the task action 'move to' tab which moves to the first enabled (not hidden) tab and returns its id
+     * @return - tabId - string
+     */
+    public String moveToTab() {
+        String tabId = "";
+        boolean isTabElEnabled;
+        for (WebElement el : taskActionsTabListel) {
+            isTabElEnabled = !el.getAttribute("class").contains("disabled");
+            if (isTabElEnabled) {
+                tabId = el.getAttribute("id").split(":")[1];
+                wait.until(ExpectedConditions.elementToBeClickable(el));
+                click(el);
+                loading();
+                break;
+            }
+        }
+        return tabId;
+    }
+
+    /**
+     * this method is a part of the task action 'Delete' flow and deletes a task or not based on input arg (enum: accept/cancel)
+     * @param state - enum - ACCEPT/CANCEL
+     */
+    public void deleteTask(AlertState state){
+        if(state == AlertState.ACCEPT){
+            allertAccept();
+            loading();
+        }
+        else if(state == AlertState.CANCEL)
+            allertcancel();
     }
 
     // other actions
@@ -615,53 +778,77 @@ public class TasksPage extends BasePage {
         return advancedBtn.isDisplayed();
     }
 
-    public boolean isTaskActionsMenuDisplayed(){
+    public boolean isTaskActionsMenuDisplayed() {
         return taskActionsMenu.isDisplayed();
     }
 
-    public boolean compareTasks(Task actual, Task expected, Map<String, String> advancedTaskPriorityMap, String shortDateformat, String shortDateCurrentYearFormat) throws ParseException {
+    public boolean isTaskNoteAreaDisplayed(int index) {
+        return taskNoteAreaListel.get(index).isDisplayed();
+    }
+
+    /**
+     * this method compares between 2 task objects and distinguishes between expected task that was entered and existing expected task;
+     * @param actual - Task object
+     * @param expected - Task object
+     * @param expectedTaskType - enum - ENTERED/EXISTING
+     * @param advancedTaskPriorityMap - map - for extracting expected task / entered - priority value
+     * @param shortDateformat - string - for calculating expected/entered task
+     * @param shortDateCurrentYearFormat - string - for calculating expected/entered task
+     * @return - boolean - if tasks are identical or not
+     * @throws ParseException
+     */
+    public boolean compareTasks(Task actual, Task expected, ExpectedTaskType expectedTaskType, Map<String, String> advancedTaskPriorityMap, String shortDateformat, String shortDateCurrentYearFormat) throws ParseException {
         boolean result = true;
         // task priority compare
-        String expectedPrio = advancedTaskPriorityMap.get(expected.getTaskPriority());
-        if(!actual.getTaskPriority().equals(expectedPrio)){
+        String expectedPrio = "";
+        String expectedDueDateValDisplay = "";
+        List<String> expectedTagList = new ArrayList<>();
+        if(expectedTaskType == ExpectedTaskType.ENTERED){
+            expectedPrio = advancedTaskPriorityMap.get(expected.getTaskPriority());
+            expectedDueDateValDisplay = DateAnalysis.getExpectedDateDisplay(expected.getTaskDueDateIn(), shortDateformat, shortDateCurrentYearFormat);
+            String expectedTaskTagString = expected.getTaskTagsString().replaceAll(" ", "");
+            expectedTagList = Arrays.asList(expectedTaskTagString.split(","));
+        }
+        else if(expectedTaskType == ExpectedTaskType.EXISTING){
+            expectedPrio = expected.getTaskPriority();
+            expectedDueDateValDisplay = expected.getDueDateText();
+            expectedTagList = expected.getTaskTagsList();
+        }
+        if (!actual.getTaskPriority().equals(expectedPrio)) {
             System.out.println("actual task priority doesn't match expected task priority!!");
             System.out.println("Expected: " + expectedPrio + "\nActual: " + actual.getTaskPriority());
             result = false;
         }
         // due date text compare
-        String expectedDueDateValDisplay = DateAnalysis.getExpectedDateDisplay(expected.getTaskDueDateIn(), shortDateformat, shortDateCurrentYearFormat);
-        if(!actual.getDueDateText().equals(expectedDueDateValDisplay)){
+        if (!actual.getDueDateText().equals(expectedDueDateValDisplay)) {
             System.out.println("actual task due date text doesn't match expected task due date!!");
             System.out.println("Expected task due date inserted: " + expected.getTaskDueDateIn() + "\nExpected task due date text display: " + expectedDueDateValDisplay
                     + "\nActual task due date text: " + actual.getTaskPriority());
             result = false;
         }
         // task name compare
-        if(!actual.getTaskName().equals(expected.getTaskName())){
+        if (!actual.getTaskName().equals(expected.getTaskName())) {
             System.out.println("actual task name doesn't match expected task name!!");
             System.out.println("actual task name: " + actual.getTaskName() + "\nExpected task name: " + expected.getTaskName());
             result = false;
         }
         // task notes compare
-        if(!actual.getTaskNotes().equals(expected.getTaskNotes())){
+        if (!actual.getTaskNotes().equals(expected.getTaskNotes())) {
             System.out.println("actual task note doesn't match expected task note!!");
             System.out.println("actual task name: " + actual.getTaskNotes() + "\nExpected task name: " + expected.getTaskNotes());
             result = false;
         }
         // task tags compare
-        String expectedTaskTagString = expected.getTaskTagsString().replaceAll(" ", "");
-        List<String> expectedTagList = Arrays.asList(expectedTaskTagString.split(","));
-        Map<String,String> actualTaskTagsMap = actual.getTaskTagsMap();
-        if(actualTaskTagsMap.size() == expectedTagList.size()){
+        Map<String, String> actualTaskTagsMap = actual.getTaskTagsMap();
+        if (actualTaskTagsMap.size() == expectedTagList.size()) {
             for (String tag : expected.getTaskTagsList()) {
-                if(!actualTaskTagsMap.containsKey(tag)){
+                if (!actualTaskTagsMap.containsKey(tag)) {
                     System.out.println("actual task doesn't include the entered tag: " + tag);
                     result = false;
                     break;
                 }
             }
-        }
-        else{
+        } else {
             System.out.println("Actual task number of tags doesn't match the number of tags entered!!");
             System.out.println("actual task tags: " + actual.getTaskTagsList().toString());
             System.out.println("expected task tags: " + expected.getTaskTagsList().toString());
@@ -670,13 +857,26 @@ public class TasksPage extends BasePage {
         return result;
     }
 
+    public boolean taskHasNotes(int index) {
+        return taskElementList.get(index).getAttribute("class").contains("note");
+    }
+
+    public boolean isTaskToggleDisplayed(int index) {
+        return taskToggleListel.get(index).isDisplayed();
+    }
+
+    public boolean isTaskNoteDisplayed(int index) {
+        return taskNoteDisplayedListEl.get(index).isDisplayed();
+    }
+
     // enums
     public enum AlertState {
         ACCEPT, CANCEL;
     }
 
     public enum SearchType {
-        CONTAINS, EQUAL, ;
+        CONTAINS, EQUAL,
+        ;
     }
 
     public enum OptionState {
@@ -685,5 +885,21 @@ public class TasksPage extends BasePage {
 
     public enum TaskType {
         SIMPLE, ADVANCED;
+    }
+
+    public enum TaskNoteConf {
+        SAVE, CANCEL;
+    }
+
+    public enum TaskAttribute {
+        DUEDATE, NOTE, TAGS;
+    }
+
+    public enum TaskNoteToggleState {
+        OPEN, CLOSE;
+    }
+
+    public enum ExpectedTaskType {
+        ENTERED, EXISTING;
     }
 }
