@@ -45,7 +45,9 @@ public class AdvancedTaskPage extends BasePage {
     private WebElement allTagsLabel;
     private List<WebElement> tagElList; // is initialized when calling showAllTags() method
 
-
+    // other page elements
+    @FindBy(css = "#page_taskedit>div>.mtt-back-button")
+    private WebElement backBtn;
     // page assistance variables
     Map<String, String> priorityOptions = new HashMap<>();
 
@@ -80,6 +82,10 @@ public class AdvancedTaskPage extends BasePage {
     }
 
     // page task action methods
+    public void goBack(){
+        click(backBtn);
+    }
+
     public void selectPriority(String value) {
         prioritySel.selectByValue(value);
     }
