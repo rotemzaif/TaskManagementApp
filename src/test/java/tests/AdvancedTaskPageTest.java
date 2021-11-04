@@ -24,7 +24,7 @@ public class AdvancedTaskPageTest extends BaseTest {
         tp = new TasksPage(driver);
         tagList = tp.getTags(); // will be used in following tests
         numOfTasksInListBefore = tp.getTasksList().size(); // will be used in following tests
-        numOfTasksDisplayedBefore = tp.getTotalTasksDisplay(); // will be used in following tests
+        numOfTasksDisplayedBefore = tp.getTotalTasksDisplayVal(); // will be used in following tests
         curTabName = tp.getCurrentTabName(); // getting tab current tab name before moving to advanced task page; will used in further tests
         tp.goToAdvancedPage();
         Thread.sleep(1000);
@@ -92,7 +92,7 @@ public class AdvancedTaskPageTest extends BaseTest {
     @Test(description = "verifying that total num of tasks displayed has not changed after canceling task submit in Advanced Task page")
     public void tc07_verify_total_num_of_tasks_displayed_after_cancel(){
         tp = new TasksPage(driver);
-        int actualTotalNumOfTaskDisplayed = tp.getTotalTasksDisplay();
+        int actualTotalNumOfTaskDisplayed = tp.getTotalTasksDisplayVal();
         Assert.assertEquals(actualTotalNumOfTaskDisplayed, numOfTasksDisplayedBefore, "num of tasks displayed has changed although " +
                 "canceling advanced task submition\n");
     }
