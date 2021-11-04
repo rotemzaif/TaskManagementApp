@@ -7,7 +7,6 @@ import pageObjects.SettingsPage;
 import pageObjects.Task;
 import pageObjects.TasksPage;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,14 +36,14 @@ public class TaskActionsTest extends BaseTest {
             Assert.fail("shortDateCurrentYear format variable is empty");
         sp.goBackToTasksPage();
         tp = new TasksPage(driver);
-        Assert.assertTrue(tp.isPageDisPlayed(tp.getTasksTotal()), "Tasks page is not displayed after returning from Settings page!!\n");
+        Assert.assertTrue(tp.isPageDisPlayed(tp.getTasksTotalEl()), "Tasks page is not displayed after returning from Settings page!!\n");
         tp.goToAdvancedPage();
         atp = new AdvancedTaskPage(driver);
         Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "Advanced task page is not displayed!! Cannot enter a task!!\n");
         advancedTaskPriorityMap = atp.getPriorityOptionsMap();
         atp.goBack();
         tp = new TasksPage(driver);
-        Assert.assertTrue(tp.isPageDisPlayed(tp.getTasksTotal()), "Tasks page is not displayed after returning from Advanced Task page!!\n");
+        Assert.assertTrue(tp.isPageDisPlayed(tp.getTasksTotalEl()), "Tasks page is not displayed after returning from Advanced Task page!!\n");
     }
 
     @Test(description = "check if a tab that its name contains 'rzf' exist, if not create one and add tasks to the list")
