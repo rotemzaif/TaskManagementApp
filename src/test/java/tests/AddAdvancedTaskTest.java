@@ -106,7 +106,7 @@ public class AddAdvancedTaskTest extends BaseTest {
                 "task: " + enteredTask.getTaskName() + "\n");
         // verifying that added task details match the details entered
         Task addedTask = tp.getTasksList().get(tp.getTasksList().size()-1);
-        Assert.assertTrue(tp.compareTasks(addedTask, enteredTask, advancedTaskPriorityMap, shortDateformat, shortDateCurrentYearFormat), "one or more task details don't match!! View logs or console messages for more details");
+        Assert.assertTrue(tp.compareTasks(addedTask, enteredTask, TasksPage.ExpectedTaskType.ENTERED, advancedTaskPriorityMap, shortDateformat, shortDateCurrentYearFormat), "one or more task details don't match!! View logs or console messages for more details");
     }
 
     @Test
