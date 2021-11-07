@@ -12,6 +12,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import pageObjects.TaskList;
 import pageObjects.TasksPage;
 import utils.Utils;
 
@@ -23,6 +24,7 @@ public class BaseTest {
     // objects
     WebDriver driver;
     TasksPage tp;
+    TaskList tl;
 
     // variables
     String tabId = "";
