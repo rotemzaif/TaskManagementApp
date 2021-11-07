@@ -26,12 +26,12 @@ public class AddSimpleTaskTest extends BaseTest {
         // checking if there are tabs with the same name; if there are, selecting the 1st one and setting its sort display
         if(tabsIdWithSameName.size() > 0){
             tabId = tabsIdWithSameName.get(0);
-            tl.setTabSortDisplay(tabId, "Sort by hand");
+            tl.setTabSortDisplay(tabId, TasksPage.SortOption.HAND);
             tl.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT);
         }
         // there are no tabs with name 'rzf - tasks' --> creating a new tab + setting view settings
         else
-            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, "Sort by hand", TasksPage.OptionState.UNSELECT);
+            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TasksPage.OptionState.UNSELECT);
         tl = new TaskList(driver);
         // verifying tab is created
         if(tabId.isEmpty())
