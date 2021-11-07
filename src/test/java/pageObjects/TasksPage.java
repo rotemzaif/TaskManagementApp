@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
 import java.util.*;
 
 /**
@@ -44,6 +45,7 @@ public class TasksPage extends BasePage {
     }
 
     // general getters methods
+
     /**
      * @return List<String> tag names
      * @description this extracts all tag elements, extracts their name and add it to a list
@@ -52,7 +54,7 @@ public class TasksPage extends BasePage {
         click(tagsBtn);
         List<String> tagList = new ArrayList<>();
         // checking if there are tags
-        if(tagElList.size() != 0){
+        if (tagElList.size() != 0) {
             wait.until(ExpectedConditions.visibilityOfAllElements(tagElList));
             String tagName = "";
             for (WebElement el : tagElList) {
@@ -197,6 +199,7 @@ public class TasksPage extends BasePage {
     }
 
     // tab related actions
+
     /**
      * @param tabName     - String
      * @param allertState - enum ACCPET/CANCEL
@@ -206,7 +209,7 @@ public class TasksPage extends BasePage {
      * @description method that creates a new tab (or cancels), sets tab sort option according to arg entered, and select/un-select
      * 'Show completed tasks' according to state arg entered
      */
-    public String createNewTab(String tabName, AlertState allertState, String sortOption, OptionState sctSate) {
+    public String createNewTab(String tabName, AlertState allertState, SortOption sortOption, OptionState sctSate) {
         String tabId = "";
         click(newTabBtn);
         allertSendText(tabName);
@@ -215,7 +218,7 @@ public class TasksPage extends BasePage {
             loading();
             tabId = tabList.get(tabList.size() - 1).getAttribute("id");
             // set tab sort display
-            if (!sortOption.isEmpty()) {
+            if(sortOption != null){
                 if (!setTabSortDisplay(tabId, sortOption))
                     System.out.println("'" + sortOption + "' was not found in the tab action menu list!\n");
             }
@@ -331,14 +334,15 @@ public class TasksPage extends BasePage {
      * @param sortOption - String
      * @description this method moves to the desired tab and sets its sort display according to param
      */
-    public boolean setTabSortDisplay(String tabId, String sortOption) {
+    public boolean setTabSortDisplay(String tabId, SortOption sortOption) {
+        String sortType = sortOption.getSort();
         boolean optionFound = false;
         if (!getCurrentTabId().equals(tabId))
             goToTabById(tabId);
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
         click(tabActionsBtn);
         for (WebElement op : tabActionList) {
-            if (getText(op).equals(sortOption)) {
+            if (getText(op).equals(sortType)) {
                 optionFound = true;
                 if (!op.getAttribute("class").contains("checked"))
                     click(op);
@@ -382,6 +386,7 @@ public class TasksPage extends BasePage {
     }
 
     // tab related validations
+
     /**
      * @param tabId - string
      * @return true/false if tab exist
@@ -448,5 +453,23 @@ public class TasksPage extends BasePage {
 
     public enum OptionState {
         SELECT, UNSELECT;
+    }
+
+    public enum SortOption {
+        HAND("Sort by hand"),
+        DATECREATED("Sort by date created"),
+        PRIORITY("Sort by priority"),
+        DUEDATE("Sort by due date"),
+        DATEMODIFIED("Sort by date modified");
+
+        private String sort;
+
+        public String getSort(){
+            return this.sort;
+        }
+
+        SortOption(String sort){
+            this.sort = sort;
+        }
     }
 }
