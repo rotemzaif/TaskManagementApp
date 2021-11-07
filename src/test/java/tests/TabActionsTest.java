@@ -17,7 +17,7 @@ public class TabActionsTest extends BaseTest {
         // getting num of visible tabs before the action
         numOfTabBefore = tp.getTabList().size();
         tabName = "rzf - new tab test";
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.CANCEL,"", null);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.CANCEL,null, null);
         if(tabId != null)
             Assert.fail("tab is created although canceling tab creation action\n");
         // getting num of visible tabs after the action
@@ -30,7 +30,7 @@ public class TabActionsTest extends BaseTest {
     @Test(description = "create a new tab and verify it was created and added in the visible tab list and in the TabSelectList")
     public void tc02_create_new_tab(){
         tp = new TasksPage(driver);
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT,"", null);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT,null, null);
         tp = new TasksPage(driver);
         if(tabId.isEmpty())
             Assert.fail("failed to create a tab for testing");
@@ -71,10 +71,10 @@ public class TabActionsTest extends BaseTest {
     @Test
     public void tc07_tab_display_sort_by_priority(){
         tp = new TasksPage(driver);
-        String sortOption = "Sort by priority";
-        tp.setTabSortDisplay(tabId, sortOption);
+        tp.setTabSortDisplay(tabId, TasksPage.SortOption.PRIORITY);
+        String expectedSortOption = TasksPage.SortOption.PRIORITY.getSort();
         String actualSortOption = tp.getTabSortOption(tabId);
-        Assert.assertEquals(actualSortOption, sortOption, "'" + sortOption + "' option is not selected\n");
+        Assert.assertEquals(actualSortOption, expectedSortOption, "'" + expectedSortOption + "' option is not selected\n");
     }
 
     @Test
