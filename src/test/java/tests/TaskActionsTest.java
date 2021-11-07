@@ -56,8 +56,7 @@ public class TaskActionsTest extends BaseTest {
         else {
             // creating a new tab
             String tabName = "rzf - task actions test";
-            String sortOption = "Sort by hand";
-            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, sortOption, TaskList.OptionState.UNSELECT);
+            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TaskList.OptionState.UNSELECT);
             if (tabId.isEmpty())
                 Assert.fail("failed to create a tab for testing");
             Assert.assertTrue(tl.isTabExistInVisibleList(tabId), "tab id: " + tabId + " is created but not visible\n");
@@ -225,7 +224,7 @@ public class TaskActionsTest extends BaseTest {
         Assert.assertFalse(tl.getTasksMap().containsKey(taskToMoveId), "target task: '" + taskToMoveName + "' is still in current tab!!\n");
         // move to target tab
         tl.goToTabFromList(targetTabId);
-        tl.setTabSortDisplay(targetTabId, "Sort by hand");
+        tl.setTabSortDisplay(targetTabId, TasksPage.SortOption.HAND);
         tl.setTabCompletedTasksDisplay(targetTabId, TaskList.OptionState.UNSELECT);
         // verify 'moved task' was added in target tab
         tl.searchText(taskToMoveName);
