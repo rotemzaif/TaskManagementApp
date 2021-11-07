@@ -3,10 +3,7 @@ package tests;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import pageObjects.AdvancedTaskPage;
-import pageObjects.SettingsPage;
-import pageObjects.Task;
-import pageObjects.TaskList;
+import pageObjects.*;
 import utils.Utils;
 
 import java.text.ParseException;
@@ -50,7 +47,7 @@ public class AddAdvancedTaskTest extends BaseTest {
         }
         // if there is no tab with tabName, create a new tab and set its display settings
         else
-            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, "Sort by hand", TaskList.OptionState.UNSELECT);
+            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TaskList.OptionState.UNSELECT);
         Assert.assertTrue(tl.isTabExistInVisibleList(tabId), "failed to retrieve a tab for testing!!\n");
     }
 
