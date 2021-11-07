@@ -3,37 +3,49 @@ package tests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.AdvancedTaskPage;
+import pageObjects.Task;
 import pageObjects.TaskList;
-import utils.Utils;
 
 import java.util.List;
 import java.util.Map;
 
 public class AdvancedTaskPageTest extends BaseTest {
     // test variables
-    List<String> tagList;
-    int numOfTasksInListBefore = 0;
-    int numOfTasksDisplayedBefore = 0;
-    String curTabName = "";
+    private List<String> tagList;
+    private int numOfTasksInListBefore = 0;
+    private int numOfTasksDisplayedBefore = 0;
+    private String testingTabId = "";
 
     // test objects
     AdvancedTaskPage atp;
 
-    @Test(description = "click on the 'advanced' button and verify that 'Advanced task' page is displayed")
-    public void tc01_go_to_advanced_task_page() throws InterruptedException {
+    @Test(description = "creating and extracting variables data which will be used in further test methods: current tab id, current num of tasks, " +
+            "checking if there are tags, if not then create an advanced task and add tags")
+    public void tc01_test_setup_creating_and_extracting_variables_data() {
         tl = new TaskList(driver);
-        tagList = tp.getTags(); // will be used in following tests
-        numOfTasksInListBefore = tl.getTasksList().size(); // will be used in following tests
-        numOfTasksDisplayedBefore = tl.getTotalTasksDisplayVal(); // will be used in following tests
-        curTabName = tl.getCurrentTabName(); // getting tab current tab name before moving to advanced task page; will used in further tests
-        tl.goToAdvancedPage();
-        atp = new AdvancedTaskPage(driver);
-        Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "'Advanced task' page is not displayed\n");
+        testingTabId = tl.getCurrentTabId(); // will be used for verifying that we returned to the correct tab from advanced page
+        // checking if there are tasks in the list OR if there are tasks then check if there are tags in the task list;
+        // in there no tasks or tags, then create and advanced task with tags
+        if(tl.getTasksList().size() == 0 || tl.getTagsList().size() == 0){
+            tl.goToAdvancedPage();
+            atp = new AdvancedTaskPage(driver);
+            Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "Advanced Task page is not displayed!! following tests may fail!!\n");
+            atp.submitTask(new Task("2", "12.10.21", null, "create a new advanced task", "create a new advanced tab for testing purposes", "rzf, automation"));
+            tl = new TaskList(driver);
+        }
+        numOfTasksInListBefore = tl.getTasksList().size(); // will be used for verifying num of task when returning from advanced page
+        numOfTasksDisplayedBefore = tl.getTotalTasksDisplayVal(); // will be used for verifying num of task when returning from advanced page
+        tagList = tp.getTagsList(); // will be used to check tags in advanced page
+        Assert.assertTrue(numOfTasksInListBefore != 0, "There are no tasks in the list; some tests will fail!!\n");
+        Assert.assertTrue(tagList.size() != 0, "There are no tags in the list, some tests may fail!!\n");
     }
 
     @Test(description = "select one of the priority options and verify it is displayed as selected option")
     public void tc02_verify_priority_selection(){
+        tl = new TaskList(driver);
+        tl.goToAdvancedPage();
         atp = new AdvancedTaskPage(driver);
+        Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "Advanced Task page is not displayed!! following tests may fail!!\n");
         String valueToEnter = "2";
         atp.selectPriority(valueToEnter);
         String expectedValue = atp.getPriorityOptionsMap().get(valueToEnter);
@@ -69,16 +81,14 @@ public class AdvancedTaskPageTest extends BaseTest {
     }
 
     @Test(description = "click on 'cancel' and verify that Tasks page is displayed")
-    public void tc05_cancel_advanced_task() throws InterruptedException {
+    public void tc05_cancel_advanced_task() {
         atp = new AdvancedTaskPage(driver);
         atp.enterTaskName("rzf - advanced task");
         atp.cancelSubmit();
-        Thread.sleep(1000);
         tl = new TaskList(driver);
         // verifying that we are getting back to the tab we came from
-        String expectedPageTitle = curTabName + " " + Utils.readProperty("pageTitle");
-        String actualPageTitle = driver.getTitle();
-        Assert.assertEquals(actualPageTitle, expectedPageTitle, "'" + expectedPageTitle + "' page is not displayed\n");
+        String actualTabId = tl.getCurrentTabId();
+        Assert.assertEquals(actualTabId, testingTabId, "Did not return to the tab we came from when canceling advanced task submit!!\n");
     }
 
     @Test(description = "verifying that num of tasks in task list has not changed after canceling task submit in Advanced Task page")
