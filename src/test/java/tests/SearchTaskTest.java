@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import pageObjects.AdvancedTaskPage;
 import pageObjects.Task;
 import pageObjects.TaskList;
+import pageObjects.TasksPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class SearchTaskTest extends BaseTest {
     @Test(description = "creating a new tab for testing text search in the task list")
     public void tc01_create_new_tab_for_testing() {
         tl = new TaskList(driver);
-        tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, "Sort by hand", TaskList.OptionState.UNSELECT);
+        tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TaskList.OptionState.UNSELECT);
         tl = new TaskList(driver);
         // verifying tab is created
         if(tabId.isEmpty())
