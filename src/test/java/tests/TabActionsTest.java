@@ -4,9 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.TasksPage;
 
+
 public class TabActionsTest extends BaseTest {
-    // objects
-    TasksPage tp;
 
     // variables
     String tabRaname = "rzf - tab rename test";
