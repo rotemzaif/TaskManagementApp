@@ -48,14 +48,17 @@ public class TasksPage extends BasePage {
      * @return List<String> tag names
      * @description this extracts all tag elements, extracts their name and add it to a list
      */
-    public List<String> getTags() {
+    public List<String> getTagsList() {
         click(tagsBtn);
-        wait.until(ExpectedConditions.visibilityOfAllElements(tagElList));
         List<String> tagList = new ArrayList<>();
-        String tagName = "";
-        for (WebElement el : tagElList) {
-            tagName = getText(el);
-            tagList.add(tagName);
+        // checking if there are tags
+        if(tagElList.size() != 0){
+            wait.until(ExpectedConditions.visibilityOfAllElements(tagElList));
+            String tagName = "";
+            for (WebElement el : tagElList) {
+                tagName = getText(el);
+                tagList.add(tagName);
+            }
         }
         return tagList;
     }
