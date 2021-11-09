@@ -45,6 +45,7 @@ public class BasePage {
     }
 
     public String getText(WebElement el){
+        elementHighLight(el, "orange");
         return el.getText();
     }
 
@@ -100,13 +101,5 @@ public class BasePage {
         wait.until(ExpectedConditions.invisibilityOf(loading));
     }
 
-    public void waitForLoad(WebDriver driver) {
-        ExpectedCondition<Boolean> pageLoadCondition = new
-                ExpectedCondition<Boolean>() {
-                    public Boolean apply(WebDriver driver) {
-                        return js.executeScript("return document.readyState").equals("complete");
-                    }
-                };
-        wait.until(pageLoadCondition);
-    }
+
 }
