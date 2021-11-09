@@ -54,6 +54,7 @@ public class AddAdvancedTaskTest extends BaseTest {
     @Test(description = "moving to Settings page in order to extract system date formats for following testing methods validations")
     public void tc02_extract_system_date_formats(){
         tl = new TaskList(driver);
+        tl.goToTabById(tabId);
         numOfTasksInListBefore = tl.getTasksList().size();
         totTasksDisplayBefore = tl.getTotalTasksDisplayVal();
         tl.goToSettingsPage();
