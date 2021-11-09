@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="C:/Users/Rotem/git_repo/MyFinalproject">
+        <classes>
+            <class name="tests.TabActionsTest">
+                <methods>
+                    <include name="tc01_cancel_tab_creation"/>
+                    <include name="tc02_create_new_tab"/>
+                    <include name="tc03_rename_tab_cancel"/>
+                    <include name="tc04_rename_tab_accept"/>
+                    <include name="tc05_hide_tab"/>
+                    <include name="tc06_show_tab"/>
+                    <include name="tc07_tab_display_sort_by_priority"/>
+                    <include name="tc08_tab_display_unselect_Show_completed_tasks"/>
+                    <include name="tc09_cancel_delete_tab"/>
+                    <include name="tc10_accept_delete_tab"/>
+                </methods>
+            </class>
+            <class name="tests.AddSimpleTaskTest">
+                <methods>
+                    <include name="tc01_create_new_tab_for_testing"/>
+                    <include name="tc03_create_multiple_simple_tasks"/>
+                    <include name="tc04_verify_total_num_of_tasks_display"/>
+                </methods>
+            </class>
+            <class name="tests.AdvancedTaskPageTest">
+                <methods>
+                    <include name="tc01_test_setup_creating_and_extracting_variables_data"/>
+                    <include name="tc02_verify_priority_selection"/>
+                    <include name="tc03_show_all_tags"/>
+                    <include name="tc04_hide_tags"/>
+                    <include name="tc05_cancel_advanced_task"/>
+                    <include name="tc06_verify_num_of_tasks_in_list_after_cancel"/>
+                    <include name="tc07_verify_total_num_of_tasks_displayed_after_cancel"/>
+                </methods>
+            </class>
+            <class name="tests.AddAdvancedTaskTest">
+                <methods>
+                    <include name="tc01_check_for_existing_testing_tab"/>
+                    <include name="tc02_extract_system_date_formats"/>
+                    <include name="tc03_create_multiple_advanced_tasks"/>
+                    <include name="tc04_check_total_num_tasks_display"/>
+                </methods>
+            </class>
+            <class name="tests.SearchTaskTest">
+                <methods>
+                    <include name="tc01_create_new_tab_for_testing"/>
+                    <include name="tc02_add_tasks_to_tab"/>
+                    <include name="tc03_search_for_keyword"/>
+                    <include name="tc04_remove_search_text"/>
+                </methods>
+            </class>
+            <class name="tests.TaskActionsTest">
+                <methods>
+                    <include name="tc01_test_setup"/>
+                    <include name="tc02_search_for_testing_tab"/>
+                    <include name="tc03_edit_a_simple_task"/>
+                    <include name="tc04_cancel_simple_task_note_edit"/>
+                    <include name="tc05_save_simple_task_note_edit"/>
+                    <include name="tc06_edit_an_existing_task_note"/>
+                    <include name="tc07_change_a_task_priority"/>
+                    <include name="tc08_move_a_task_to_another_tab"/>
+                    <include name="tc09_delete_a_task"/>
+                </methods>
+            </class>
+            <class name="tests.DefectsTest">
+                <methods>
+                    <include name="tc01_incorrect_tab_name"/>
+                    <include name="tc02_incorrect_task_name"/>
+                    <include name="tc03_incorrect_total_task_display"/>
+                    <include name="tc04_advanced_page_label_is_not_displayed"/>
+                    <include name="tc05_task_actions_menu_is_not_displayed"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
