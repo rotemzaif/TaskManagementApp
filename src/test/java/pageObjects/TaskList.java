@@ -73,6 +73,7 @@ public class TaskList extends TasksPage {
     public TaskList(WebDriver driver) {
         super(driver);
         wait.until(ExpectedConditions.visibilityOf(taskListContainer));
+        wait.until(ExpectedConditions.visibilityOf(tasksTotalEl));
         String key;
         for (WebElement prio : taskActionsPriorityListel) {
             key = prio.getAttribute("id").split(":")[1];
@@ -273,6 +274,13 @@ public class TaskList extends TasksPage {
     }
 
     // task actions (edit, note edit, priority edit, delete, move to to tab) related methods
+
+    public void openTaskActionsMenu(int index){
+        WebElement taskActionBtn = taskActionBtnList.get(index);
+        moveTo(taskActionBtn);
+        wait.until(ExpectedConditions.elementToBeClickable(taskActionBtn));
+        click(taskActionBtn);
+    }
 
     /**
      * @description - this method open the task actions menu (per task index) and clicks on the action per input
