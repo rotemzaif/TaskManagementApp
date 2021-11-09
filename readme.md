@@ -57,6 +57,23 @@ Test plan
 
 * a detailed application test plan can be found under the project folder: MyTinyTodo_test_plan.xlsx
 
+* there are 7 test classes:
+
+    - tab actions: creating a new tab, renaming a tab, deleting a tab, sort display options
+    
+    - adding a simple task: creating a dedicated tab for testing, adding multiple simple (name only) tasks (using @dataprovider & tasks data from excel file), verifying
+    that num of tasks in the list has increased
+    
+    - advanced task page: testing all page elements (edit boxes, Select element options, save/cancel buttons, labels etc.)
+    
+    - add an advanced task: creating a dedicated testing tab if doesn't exists, adding multiple advanced tasks (using @dataprovider & tasks data from excel file), verifying that task list has increased, verifying added task Vs. entered task details
+    
+    - search text: searching a text in a tab, expecting to get a list of task that have that text in their name or notes
+    
+    - task actions: edit (all task attributes), task priority (directly from the list), task note (directly from the list), move task to another tab, and delete tab
+    
+    - defects: this test class includes 5 test methods which should fail intentionally    
+
 * NOTE: not all application features have been tested
 
 Setup & Prerequisites
@@ -77,6 +94,8 @@ Reporting
 Notes
 
 * for test methods which read data from files (tasks data) - I used @dataprovider
+
+* the framework captures failed tests images which are saved to folder 'Screenshots' under the project folder: 
 
 * in the framework code, I used Maps (tabs, tasks, tasks tags, task priorities) whenever I could for search performance 
 
