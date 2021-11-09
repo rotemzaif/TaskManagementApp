@@ -16,17 +16,6 @@ public class DefectsTest extends BaseTest {
 
     AdvancedTaskPage atp;
 
-//    @Test
-//    public void tc00_testing(){
-//        tl = new TaskList(driver);
-//        tl.goToAdvancedPage();
-//        atp = new AdvancedTaskPage(driver);
-//        Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "advanced page is not displayed");
-//        atp.goBack();
-//        tl = new TaskList(driver);
-//        Assert.assertTrue(tl.isPageDisPlayed(tl.getTasksTotalEl()),"tasks page is not displayed");
-//    }
-
     @Test(description = "create a new tab, move to the new tab and check tab name with a faulty name")
     public void tc01_incorrect_tab_name(){
         tp = new TasksPage(driver);
