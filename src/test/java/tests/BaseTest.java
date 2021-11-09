@@ -57,7 +57,7 @@ public class BaseTest {
             File srcFile = ts.getScreenshotAs(OutputType.FILE);
             try {
                 //result.getname() method will return current test case name.
-                FileUtils.copyFile(srcFile, new File("./ScreenShots/" +result.getName() + ".jpg"));
+                FileUtils.copyFile(srcFile, new File("./ScreenShots/" + result.getTestClass().getName() + "_" + result.getName() + ".jpg"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
