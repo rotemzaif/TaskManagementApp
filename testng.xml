@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="All Test Suite">
-    <test verbose="2" preserve-order="true" name="C:/Users/Rotem/git_repo/MyFinalproject">
+    <test verbose="2" preserve-order="true" thread-count="2" parallel="classes" name="TaskManagementApp">
         <classes>
             <class name="tests.TabActionsTest">
                 <methods>
