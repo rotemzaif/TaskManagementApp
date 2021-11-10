@@ -55,7 +55,6 @@ public class TasksPage extends BasePage {
         List<String> tagList = new ArrayList<>();
         // checking if there are tags
         if (tagElList.size() != 0) {
-            wait.until(ExpectedConditions.visibilityOfAllElements(tagElList));
             String tagName = "";
             for (WebElement el : tagElList) {
                 tagName = getText(el);
