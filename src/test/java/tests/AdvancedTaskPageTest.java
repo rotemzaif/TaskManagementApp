@@ -6,12 +6,13 @@ import pageObjects.AdvancedTaskPage;
 import pageObjects.Task;
 import pageObjects.TaskList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class AdvancedTaskPageTest extends BaseTest {
     // test variables
-    private List<String> tagList;
+    private List<String> tagList = new ArrayList<>();
     private int numOfTasksInListBefore = 0;
     private int numOfTasksDisplayedBefore = 0;
     private String testingTabId = "";
@@ -35,7 +36,7 @@ public class AdvancedTaskPageTest extends BaseTest {
         }
         numOfTasksInListBefore = tl.getTasksList().size(); // will be used for verifying num of task when returning from advanced page
         numOfTasksDisplayedBefore = tl.getTotalTasksDisplayVal(); // will be used for verifying num of task when returning from advanced page
-        tagList = tp.getTagsList(); // will be used to check tags in advanced page
+        tagList = tl.getTagsList(); // will be used to check tags in advanced page
         Assert.assertTrue(numOfTasksInListBefore != 0, "There are no tasks in the list; some tests will fail!!\n");
         Assert.assertTrue(tagList.size() != 0, "There are no tags in the list, some tests may fail!!\n");
     }
