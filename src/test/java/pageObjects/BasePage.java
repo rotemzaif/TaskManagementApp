@@ -45,7 +45,6 @@ public class BasePage {
     }
 
     public String getText(WebElement el){
-        elementHighLight(el, "orange");
         return el.getText();
     }
 
