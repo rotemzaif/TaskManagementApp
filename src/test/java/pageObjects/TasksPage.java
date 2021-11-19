@@ -36,7 +36,7 @@ public class TasksPage extends BasePage {
     @FindBy(css = "#tabs_buttons")
     private WebElement tabsSelectListBtn;
     @FindBy(css = "#slmenucontainer > ul > li")
-    private List<WebElement> tabsSelectList;
+    private List<WebElement> tabElSelectList;
     @FindBy(css = ".mtt-tabs > li > a > span")
     private List<WebElement> tabNameListEl;
 
@@ -114,8 +114,8 @@ public class TasksPage extends BasePage {
         return tabIdList;
     }
 
-    public List<WebElement> getTabsSelectList() {
-        return tabsSelectList;
+    public List<WebElement> getTabElSelectList() {
+        return tabElSelectList;
     }
 
     /**
@@ -143,9 +143,9 @@ public class TasksPage extends BasePage {
     public Map<String, WebElement> getTabsFromListMap() {
         Map<String, WebElement> tabsSelectListMap = new HashMap<>();
         String key;
-        for (int i = 2; i < tabsSelectList.size(); i++) {
-            key = tabsSelectList.get(i).getAttribute("id");
-            tabsSelectListMap.put(key, tabsSelectList.get(i));
+        for (int i = 2; i < tabElSelectList.size(); i++) {
+            key = tabElSelectList.get(i).getAttribute("id");
+            tabsSelectListMap.put(key, tabElSelectList.get(i));
         }
         return tabsSelectListMap;
     }
