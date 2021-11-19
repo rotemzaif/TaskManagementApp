@@ -19,6 +19,8 @@ public class TasksPage extends BasePage {
     private WebElement settingsLink;
     @FindBy(css = "#tagcloudbtn")
     private WebElement tagsBtn;
+    @FindBy(css = "#tagcloudcancel")
+    private WebElement closeTagsMenuBtn;
     @FindBy(css = "#tagcloudcontent > a")
     private List<WebElement> tagElList;
 
@@ -26,7 +28,7 @@ public class TasksPage extends BasePage {
     @FindBy(css = ".mtt-tabs-add-button")
     private WebElement newTabBtn;
     @FindBy(css = ".mtt-tabs.ui-sortable > li")
-    private List<WebElement> tabList;
+    private List<WebElement> tabElList;
     @FindBy(css = ".list-action")
     private List<WebElement> tabActionsBtnListEl; // will be initialized when tab is selected
     @FindBy(css = "#listmenucontainer > ul > li")
@@ -50,8 +52,9 @@ public class TasksPage extends BasePage {
      * @return List<String> tag names
      * @description this extracts all tag elements, extracts their name and add it to a list
      */
-    public List<String> getTagsList() {
+    public List<String> getTagsNameList() {
         click(tagsBtn);
+        wait.until(ExpectedConditions.visibilityOf(closeTagsMenuBtn));
         List<String> tagList = new ArrayList<>();
         // checking if there are tags
         if (tagElList.size() != 0) {
@@ -60,6 +63,7 @@ public class TasksPage extends BasePage {
                 tagName = getText(el);
                 tagList.add(tagName);
             }
+            click(closeTagsMenuBtn);
         }
         return tagList;
     }
@@ -69,9 +73,20 @@ public class TasksPage extends BasePage {
         click(settingsLink);
     }
 
+    // general validation
+    public boolean tagsExistance(){
+        boolean result = false;
+        click(tagsBtn);
+        wait.until(ExpectedConditions.visibilityOf(closeTagsMenuBtn));
+        if(tagElList.size() != 0)
+            result = true;
+        click(closeTagsMenuBtn);
+        return result;
+    }
+
     // tab related getters
-    public List<WebElement> getTabList() {
-        return tabList;
+    public List<WebElement> getTabElList() {
+        return tabElList;
     }
 
     /**
@@ -83,16 +98,16 @@ public class TasksPage extends BasePage {
      */
     public List<String> getTabIdListForName(String tabName, SearchType searchType) {
         List<String> tabIdList = new ArrayList<>();
-        if (tabList.size() == tabNameListEl.size()) {
+        if (tabElList.size() == tabNameListEl.size()) {
             String name;
-            for (int i = 0; i < tabList.size(); i++) {
+            for (int i = 0; i < tabElList.size(); i++) {
                 name = getText(tabNameListEl.get(i));
                 if (searchType == SearchType.EQUAL) {
                     if (name.equals(tabName))
-                        tabIdList.add(tabList.get(i).getAttribute("id"));
+                        tabIdList.add(tabElList.get(i).getAttribute("id"));
                 } else if (searchType == SearchType.CONTAINS) {
                     if (name.contains(tabName))
-                        tabIdList.add(tabList.get(i).getAttribute("id"));
+                        tabIdList.add(tabElList.get(i).getAttribute("id"));
                 }
             }
         } else System.out.println("num of tabs names doesn't match num of visible tabs");
@@ -110,10 +125,10 @@ public class TasksPage extends BasePage {
         Map<String, List<Object>> tabsMap = new HashMap<>();
         String tabId, tabName;
         WebElement tabEl, tabActionsBtn;
-        if (tabList.size() == tabNameListEl.size() && tabList.size() == tabActionsBtnListEl.size() - 1) {
-            for (int i = 0; i < tabList.size(); i++) {
-                tabId = tabList.get(i).getAttribute("id");
-                tabEl = tabList.get(i);
+        if (tabElList.size() == tabNameListEl.size() && tabElList.size() == tabActionsBtnListEl.size() - 1) {
+            for (int i = 0; i < tabElList.size(); i++) {
+                tabId = tabElList.get(i).getAttribute("id");
+                tabEl = tabElList.get(i);
                 tabName = getText(tabNameListEl.get(i));
                 tabActionsBtn = tabActionsBtnListEl.get(i);
                 tabsMap.put(tabId, Arrays.asList(tabEl, tabName, tabActionsBtn));
@@ -149,7 +164,7 @@ public class TasksPage extends BasePage {
      */
     public String getCurrentTabName() {
         String tabName = "";
-        for (WebElement tab : tabList) {
+        for (WebElement tab : tabElList) {
             if (tab.getAttribute("class").contains("selected")) {
                 tabName = getText(tab.findElement(By.cssSelector("a > span")));
                 break;
@@ -165,7 +180,7 @@ public class TasksPage extends BasePage {
      */
     public String getCurrentTabId() {
         String tabId = "";
-        for (WebElement tab : tabList) {
+        for (WebElement tab : tabElList) {
             if (tab.getAttribute("class").contains("selected")) {
                 tabId = tab.getAttribute("id");
                 break;
@@ -215,7 +230,7 @@ public class TasksPage extends BasePage {
         if (allertState == AlertState.ACCEPT) {
             allertAccept();
             loading();
-            tabId = tabList.get(tabList.size() - 1).getAttribute("id");
+            tabId = tabElList.get(tabElList.size() - 1).getAttribute("id");
             // set tab sort display
             if(sortOption != null){
                 if (!setTabSortDisplay(tabId, sortOption))
