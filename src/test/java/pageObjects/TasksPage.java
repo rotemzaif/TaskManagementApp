@@ -241,10 +241,8 @@ public class TasksPage extends BasePage {
                 if (!setTabCompletedTasksDisplay(tabId, sctSate))
                     System.out.println("'Show completed tasks' option was not found in the tab action menu list!\n");
             }
-        } else if (allertState == AlertState.CANCEL) {
+        } else if (allertState == AlertState.CANCEL)
             allertcancel();
-            tabId = null;
-        }
         return tabId;
     }
 
