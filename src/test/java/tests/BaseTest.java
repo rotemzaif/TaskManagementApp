@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.ITestResult;
@@ -62,5 +63,20 @@ public class BaseTest {
                 e.printStackTrace();
             }
         }
+    }
+
+    // common methods
+
+    /**
+     * this method checks if target/tested tab is selected;
+     * if not selected, then moving to target/tested tab
+     * @param tp - TasksPage object
+     * @param tabId - target/tested tab id
+     */
+    public void moveToTargetTab(TasksPage tp, String tabId){
+        // checking if target/tested tab is selected; if not, then moving/selecting target tab
+        WebElement tab = (WebElement) tp.getTabsMap().get(tabId).get(0);
+        if(!tab.getAttribute("class").contains("selected"))
+            tp.goToTabById(tabId);
     }
 }
