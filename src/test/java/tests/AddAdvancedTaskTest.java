@@ -32,12 +32,14 @@ public class AddAdvancedTaskTest extends BaseTest {
         // if there is one tab with tabName, get its id
         if(tabsWithSameName.size() == 1)
             tabId = tabsWithSameName.get(0);
-        // if there multiple tabs with the sane tabName, delete all tabs except the first
+        // if there multiple tabs with the same tabName, delete all tabs except the first
         else if(tabsWithSameName.size() > 1){
             String id;
             for (int i = tabsWithSameName.size()-1; i > 0 ; i--) {
                 id = tabsWithSameName.get(i);
-                tl.deleteTabById(id, TaskList.AlertState.ACCEPT);
+                tl.goToTabById(id);
+                tl.openTabActionsMenu(id);
+                tl.deleteTab(TaskList.AlertState.ACCEPT);
             }
             tabsWithSameName = tl.getTabIdListForName(tabName, TaskList.SearchType.EQUAL);
             if(tabsWithSameName.size() == 1)
