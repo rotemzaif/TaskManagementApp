@@ -27,16 +27,16 @@ public class AdvancedTaskPageTest extends BaseTest {
         testingTabId = tl.getCurrentTabId(); // will be used for verifying that we returned to the correct tab from advanced page
         // checking if there are tasks in the list OR if there are tasks then check if there are tags in the task list;
         // in there no tasks or tags, then create and advanced task with tags
-        if(tl.getTasksList().size() == 0 || tl.getTagsList().size() == 0){
+        if(!tl.tagsExistance()){
             tl.goToAdvancedPage();
             atp = new AdvancedTaskPage(driver);
             Assert.assertTrue(atp.isPageDisPlayed(atp.getNewTaskLabel()), "Advanced Task page is not displayed!! following tests may fail!!\n");
             atp.submitTask(new Task("2", "12.10.21", null, "create a new advanced task", "create a new advanced tab for testing purposes", "rzf, automation"));
             tl = new TaskList(driver);
         }
+        tagList = tl.getTagsNameList(); // will be used to check tags in advanced page
         numOfTasksInListBefore = tl.getTasksList().size(); // will be used for verifying num of task when returning from advanced page
         numOfTasksDisplayedBefore = tl.getTotalTasksDisplayVal(); // will be used for verifying num of task when returning from advanced page
-        tagList = tl.getTagsList(); // will be used to check tags in advanced page
         Assert.assertTrue(numOfTasksInListBefore != 0, "There are no tasks in the list; some tests will fail!!\n");
         Assert.assertTrue(tagList.size() != 0, "There are no tags in the list, some tests may fail!!\n");
     }
