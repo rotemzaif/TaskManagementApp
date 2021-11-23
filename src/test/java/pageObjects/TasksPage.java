@@ -29,21 +29,31 @@ public class TasksPage extends BasePage {
     private WebElement newTabBtn;
     @FindBy(css = ".mtt-tabs.ui-sortable > li")
     private List<WebElement> tabElList;
-    @FindBy(css = ".list-action")
+    @FindBy(css = ".mtt-tabs > li > a > span")
+    private List<WebElement> tabNameListEl;
+    @FindBy(css = ".mtt-tabs.ui-sortable>li>a>.list-action")
     private List<WebElement> tabActionsBtnListEl; // will be initialized when tab is selected
     @FindBy(css = "#listmenucontainer > ul > li")
     private List<WebElement> tabActionList;
+    // tab Select list
     @FindBy(css = "#tabs_buttons")
     private WebElement tabsSelectListBtn;
     @FindBy(css = "#slmenucontainer > ul > li")
     private List<WebElement> tabElSelectList;
-    @FindBy(css = ".mtt-tabs > li > a > span")
-    private List<WebElement> tabNameListEl;
+    @FindBy(css = "#slmenucontainer > ul >li>a")
+    private List<WebElement> tabsSelectNameList;
 
+
+    // tab properties
+    Map<String, List<Object>> tabsMap = new HashMap<>();
+    Map<String, List<Object>> tabsSelectListMap = new HashMap<>();
 
     // constructor
     public TasksPage(WebDriver driver) {
         super(driver);
+        // initializing tabs maps (visible list and select list)
+        initTabsMap();
+        initTabsSelectMap();
     }
 
     // general getters methods
@@ -119,34 +129,22 @@ public class TasksPage extends BasePage {
     }
 
     /**
-     * @return - map of tab elements key = tabid, value = tab element based on visible tab list
+     * @return - map of tab elements key = tabid, value = list of the following objects: tab element, tab name, tab actions button
      */
     public Map<String, List<Object>> getTabsMap() {
-        Map<String, List<Object>> tabsMap = new HashMap<>();
-        String tabId, tabName;
-        WebElement tabEl, tabActionsBtn;
-        if (tabElList.size() == tabNameListEl.size() && tabElList.size() == tabActionsBtnListEl.size() - 1) {
-            for (int i = 0; i < tabElList.size(); i++) {
-                tabId = tabElList.get(i).getAttribute("id");
-                tabEl = tabElList.get(i);
-                tabName = getText(tabNameListEl.get(i));
-                tabActionsBtn = tabActionsBtnListEl.get(i);
-                tabsMap.put(tabId, Arrays.asList(tabEl, tabName, tabActionsBtn));
-            }
-        } else System.out.println("num of actual tabs doesn't match num of tab names or num of tab actions btn");
         return tabsMap;
     }
 
     /**
-     * @return - map of tab elements key = tabid, value = tab element based on tab list displayed in the tabs select element
+     * @return - map of tab elements key = tabid, value = list of the following objects: list element, tab name
      */
-    public Map<String, WebElement> getTabsFromListMap() {
-        Map<String, WebElement> tabsSelectListMap = new HashMap<>();
-        String key;
-        for (int i = 2; i < tabElSelectList.size(); i++) {
-            key = tabElSelectList.get(i).getAttribute("id");
-            tabsSelectListMap.put(key, tabElSelectList.get(i));
-        }
+    public Map<String, List<Object>> getTabsFromListMap() {
+//        Map<String, WebElement> tabsSelectListMap = new HashMap<>();
+//        String key;
+//        for (int i = 2; i < tabElSelectList.size(); i++) {
+//            key = tabElSelectList.get(i).getAttribute("id");
+//            tabsSelectListMap.put(key, tabElSelectList.get(i));
+//        }
         return tabsSelectListMap;
     }
 
@@ -197,9 +195,8 @@ public class TasksPage extends BasePage {
      */
     public String getTabSortOption(String tabId) {
         String selectedOption = "";
-        goToTabById(tabId);
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
+//        click(tabActionsBtn);
         for (WebElement op : tabActionList) {
             if (op.getAttribute("class").contains("sort") &&
                     op.getAttribute("class").contains("checked")) {
@@ -209,6 +206,7 @@ public class TasksPage extends BasePage {
                 break;
             }
         }
+        click(tabActionsBtn);
         return selectedOption;
     }
 
@@ -267,22 +265,24 @@ public class TasksPage extends BasePage {
             String tabIdNum = tabId.split("_")[1];
             tabIdInList = "slmenu_list:" + tabIdNum;
         } else tabIdInList = tabId;
-        click(tabsSelectListBtn);
-        wait.until(ExpectedConditions.elementToBeClickable(getTabsFromListMap().get(tabIdInList)));
-        click(getTabsFromListMap().get(tabIdInList));
+        click(tabsSelectListBtn); // opening the tabs Select list
+        wait.until(ExpectedConditions.elementToBeClickable((WebElement) getTabsFromListMap().get(tabIdInList).get(0)));
+        click((WebElement) getTabsFromListMap().get(tabIdInList).get(0));
+    }
+
+    public void openTabActionsMenu(String tabId){
+        // getting target/tested tab actions menu button element
+        WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
+        // opening the tab action menu
+        click(tabActionsBtn);
+        wait.until(ExpectedConditions.visibilityOfAllElements(tabActionList));
     }
 
     /**
-     * this method clicks on the requested tab, opens its action list menu and select the 'Delete list', and accepts or cancels it according to param
-     *
-     * @param tabId - string - for clicking the requested tab
+     * this method selects the 'Delete list' option from the tab actions menu, accepts or cancels it according to param
      * @param state - accept/cancel indication for delete action
      */
-    public void deleteTabById(String tabId, AlertState state) {
-        goToTabById(tabId);
-        WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
-//        click(tabActionListBtn);
+    public void deleteTab(AlertState state) {
         for (WebElement op : tabActionList) {
             if (getText(op).equals("Delete list")) {
                 click(op);
@@ -294,21 +294,14 @@ public class TasksPage extends BasePage {
             loading();
         } else if (state == AlertState.CANCEL)
             allertcancel();
-
     }
 
     /**
-     * this method opens the tab action list menu and selects the 'Rename list' option, enters the new tab name, and accepts/cancels
-     *
-     * @param tabId      - string - the tab id in which we want to rename
-     * @param state      - string - indicates if we want accept or cancel the rename action
-     * @param tabNewName - string - the new tab name we want to enter
+     * this method modifies a tab name according to alert state (accept/cancel) and new name received
+     * @param state         - string - indicates if we want accept or cancel the rename action
+     * @param tabNewName    - string - the new tab name we want to enter
      */
-    public void renameTab(String tabId, AlertState state, String tabNewName) {
-        goToTabById(tabId);
-        WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
-//        click(tabActionListBtn);
+    public void renameTab(AlertState state, String tabNewName){
         for (WebElement op : tabActionList) {
             if (getText(op).equals("Rename list")) {
                 click(op);
@@ -323,15 +316,7 @@ public class TasksPage extends BasePage {
             allertcancel();
     }
 
-    /**
-     * @param tabId - string
-     * @description this method selects the given tab, opens its action list menu and selects 'Hide list'
-     */
-    public void hideTab(String tabId) {
-        goToTabById(tabId);
-        WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
-//        click(tabActionListBtn);
+    public void hideTab(){
         for (WebElement op : tabActionList) {
             if (getText(op).equals("Hide list")) {
                 click(op);
@@ -349,10 +334,8 @@ public class TasksPage extends BasePage {
     public boolean setTabSortDisplay(String tabId, SortOption sortOption) {
         String sortType = sortOption.getSort();
         boolean optionFound = false;
-        if (!getCurrentTabId().equals(tabId))
-            goToTabById(tabId);
+        // getting current tab action menu button element
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
         for (WebElement op : tabActionList) {
             if (getText(op).equals(sortType)) {
                 optionFound = true;
@@ -373,9 +356,7 @@ public class TasksPage extends BasePage {
     public boolean setTabCompletedTasksDisplay(String tabId, OptionState state) {
         boolean optionFound = false;
         String option = "Show completed tasks";
-        goToTabById(tabId);
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
         for (WebElement op : tabActionList) {
             if (getText(op).equals(option)) {
                 optionFound = true;
@@ -384,13 +365,13 @@ public class TasksPage extends BasePage {
                         click(op);
                         loading();
                         break;
-                    } else click(tabActionsBtn);
+                    } else click(tabActionsBtn); // for closing the actions menu
                 } else if (state == OptionState.UNSELECT) {
                     if (op.getAttribute("class").contains("checked")) {
                         click(op);
                         loading();
                         break;
-                    } else click(tabActionsBtn);
+                    } else click(tabActionsBtn); // for closing the actions menu
                 }
             }
         }
@@ -416,7 +397,7 @@ public class TasksPage extends BasePage {
     public boolean isTabExistInSelectList(String tabId) {
         String idInList = "slmenu_list:" + tabId.split("_")[1];
         click(tabsSelectListBtn);
-        sleep(200);
+        wait.until(ExpectedConditions.visibilityOfAllElements(tabElSelectList));
         return getTabsFromListMap().containsKey(idInList);
     }
 
@@ -439,9 +420,7 @@ public class TasksPage extends BasePage {
     public boolean isTabCompletedTasksChecked(String tabId) {
         String option = "Show completed tasks";
         boolean result = false;
-        goToTabById(tabId);
         WebElement tabActionsBtn = (WebElement) getTabsMap().get(tabId).get(2);
-        click(tabActionsBtn);
         for (WebElement op : tabActionList) {
             if (getText(op).equals(option)) {
                 if (op.getAttribute("class").contains("checked"))
@@ -449,7 +428,7 @@ public class TasksPage extends BasePage {
                 break;
             }
         }
-        click(tabActionsBtn);
+        click(tabActionsBtn); // closing the tab actions menu
         return result;
     }
 
@@ -482,6 +461,38 @@ public class TasksPage extends BasePage {
 
         SortOption(String sort){
             this.sort = sort;
+        }
+    }
+
+    // assistance methods
+    public void initTabsMap(){
+        String tabId, tabName;
+        WebElement tabEl, tabActionsBtn;
+        if(tabElList.size() == tabNameListEl.size() && tabElList.size() == tabActionsBtnListEl.size()){
+            for (int i = 0; i < tabElList.size(); i++) {
+                tabId = tabElList.get(i).getAttribute("id");
+                tabEl = tabElList.get(i);
+                tabName = getText(tabNameListEl.get(i));
+                tabActionsBtn = tabActionsBtnListEl.get(i);
+                tabsMap.put(tabId, Arrays.asList(tabEl, tabName, tabActionsBtn));
+            }
+        }
+        else {
+            System.out.println("tabs name list (tabNameListEl) size or tabs action menu button list (tabActionsBtnListEl) size doesn't match tabs element list:");
+            System.out.printf("tabs element list size: %d\ntabs name list size: %d\ntabs action menu button list size: %d\n", tabElList.size(), tabNameListEl.size(),
+                    tabActionsBtnListEl.size());
+        }
+    }
+
+    public void initTabsSelectMap(){
+        String tabId, tabName;
+        WebElement tabListEl;
+        for (int i = 2; i < tabElSelectList.size(); i++) {
+            tabId = tabElSelectList.get(i).getAttribute("id");
+            tabListEl = tabElSelectList.get(i);
+//            tabName = getText(tabsSelectNameList.get(i-1));
+            tabName = tabsSelectNameList.get(i-1).getAttribute("innerHTML");
+            tabsSelectListMap.put(tabId, Arrays.asList(tabListEl, tabName));
         }
     }
 }
