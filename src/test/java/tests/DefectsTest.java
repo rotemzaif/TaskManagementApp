@@ -20,7 +20,7 @@ public class DefectsTest extends BaseTest {
     public void tc01_incorrect_tab_name(){
         tp = new TasksPage(driver);
         tabName = "rzf - defects testing";
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT, null, null);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         if(tabId.isEmpty())
             Assert.fail("tab '" + tabName + "' was not created!!\n");
         tp.goToTabById(tabId);
@@ -32,7 +32,7 @@ public class DefectsTest extends BaseTest {
     @Test(description = "create a new task and check new task name with a faulty name")
     public void tc02_incorrect_task_name(){
         tl = new TaskList(driver);
-        tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         String faultyTaskName = "create a new scenario";
         tl.addNewSimpleTask(new Task(null, null, null, "create a faulty scenario", null, null));
         String actualTaskName = tl.getTasksList().get(tl.getTasksList().size()-1).getTaskName();
@@ -42,6 +42,7 @@ public class DefectsTest extends BaseTest {
     @Test(description = "add a couple of tasks to the task list and compare total tasks display with num of tasks before adding the new tasks")
     public void tc03_incorrect_total_task_display(){
         tl = new TaskList(driver);
+        moveToTargetTab(tl, tabId);
         int totalTasksDisplayedBefore = tl.getTotalTasksDisplayVal();
         tl.addNewSimpleTask(new Task(null, null, null, "add logs to project", null, null));
         tl.addNewSimpleTask(new Task(null, null, null, "connect project to jenkins", null, null));
