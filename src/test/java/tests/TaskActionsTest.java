@@ -56,25 +56,35 @@ public class TaskActionsTest extends BaseTest {
         else {
             // creating a new tab
             String tabName = "rzf - task actions test";
-            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TaskList.OptionState.UNSELECT);
+            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT);
+            // verifying tab was created
             if (tabId.isEmpty())
-                Assert.fail("failed to create a tab for testing");
-            Assert.assertTrue(tl.isTabExistInVisibleList(tabId), "tab id: " + tabId + " is created but not visible\n");
+                Assert.fail("failed to create a tab for testing\n");
+            // verifying tab is displayed
+            if(!tl.isTabExistInVisibleList(tabId))
+                Assert.fail("tab id: " + tabId + " is created but not visible\n");
         }
+        // setting and verifying tab sort display - Sort by hand (for further tests validations)
         tl.goToTabById(tabId);
+        tl.openTabActionsMenu(tabId);
+        if (!tl.setTabSortDisplay(tabId, TasksPage.SortOption.HAND))
+            System.out.println("failed to set tab sort option 'Sort by hand'!! This might affect further tests results");
+        // setting testing tab 'Show completed tasks' - un-select (in case selected) for further testing purpose
+        tl.openTabActionsMenu(tabId);
+        if (!tl.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT))
+            System.out.println("failed to un-select 'Show completed tasks' option!! This might affect further tests results");
         // checking if there at least 3 tasks in the list
-        if (tl.getTasksList().size() < 3)
+        if (tl.getTaskElementList().size() < 3)
             addTasksToList(tabId);
         // checking if tasks were added
-        Assert.assertTrue(tl.getTasksList().size() >= 3, "tasks were not added!! cannot continue with test!!\n");
+        Assert.assertTrue(tl.getTaskElementList().size() >= 3, "tasks were not added!! cannot continue with test!!\n");
     }
 
     @Test(description = "select a simple task from the list and edit it by adding all tasks attributes")
     public void tc03_edit_a_simple_task() throws ParseException {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
-        int numOfTasksInListB4Edit = tl.getTasksList().size();
+        moveToTargetTab(tl, tabId);
+        int numOfTasksInListB4Edit = tl.getTaskElementList().size();
         // get first simple task index from the list
         taskIndex = tl.getTaskIndex(TaskList.TaskType.SIMPLE, null);
         // if there is no simple task in the list then adding a new simple task
@@ -91,7 +101,7 @@ public class TaskActionsTest extends BaseTest {
         Task modifiedTask = new Task("2", "01.11.21", null, "modified task name","testing task edit", "rzf");
         atp.submitTask(modifiedTask);
         tl = new TaskList(driver);
-        Assert.assertEquals(tl.getTasksList().size(), numOfTasksInListB4Edit, "task was added instead of edited");
+        Assert.assertEquals(tl.getTaskElementList().size(), numOfTasksInListB4Edit, "task was added instead of edited");
         Assert.assertEquals(tl.getTotalTasksDisplayVal(), numOfTasksInListB4Edit, "total tasks display value changed following task edit");
         // verifying task details modified are displayed correctly
         Task actualTask = tl.getTasksList().get(taskIndex);
@@ -101,8 +111,7 @@ public class TaskActionsTest extends BaseTest {
     @Test(description = "select a simple task from the list, select the 'edit note' from task actions menu, enter a note, cancel operation + verify note was not added")
     public void tc04_cancel_simple_task_note_edit() {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         taskIndex = tl.getTaskIndex(TaskList.TaskType.SIMPLE, null);
         // if there is no simple task(has no due date, note and tags) in the list then add one
         if(taskIndex == -1){
@@ -122,8 +131,7 @@ public class TaskActionsTest extends BaseTest {
     @Test(description = "select a simple task from the list, select the 'edit note' from task actions menu, enter a note, save operation + verify note was added")
     public void tc05_save_simple_task_note_edit(){
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         taskIndex = tl.getTaskIndex(TaskList.TaskType.SIMPLE, null);
         // if there is no simple task(has no due date, note and tags) in the list then add one
         if(taskIndex == -1){
@@ -147,8 +155,7 @@ public class TaskActionsTest extends BaseTest {
     @Test(description = "select an advanced task from the list, modify its existing note and verify that the new note is displayed")
     public void tc06_edit_an_existing_task_note() throws InterruptedException {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         taskIndex = tl.getTaskIndex(TaskList.TaskType.ADVANCED, TaskList.TaskAttribute.NOTE);
         // if there is no advanced task (has at least one of the following: due date, note and tags) in the list then add one
         if(taskIndex == -1){
@@ -176,8 +183,7 @@ public class TaskActionsTest extends BaseTest {
     @Test(description = "select a simple task from the list, change its priority and verify new priority is displayed")
     public void tc07_change_a_task_priority() {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         taskIndex = tl.getTaskIndex(TaskList.TaskType.SIMPLE, null);
         // if there is no simple task(has no due date, note and tags) in the list then add one
         if(taskIndex == -1){
@@ -199,14 +205,13 @@ public class TaskActionsTest extends BaseTest {
     @Test(description = "select an advanced task from the list, move it to another tab and verify it was removed from current tab and added in target tab ")
     public void tc08_move_a_task_to_another_tab() throws ParseException {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         // extracting an advanced task (task object + task id)
         taskIndex = tl.getTaskIndex(TaskList.TaskType.ADVANCED, null);
         Task taskToMove = tl.getTasksList().get(taskIndex);
         String taskToMoveId = tl.getTaskId(taskIndex);
         String taskToMoveName = taskToMove.getTaskName();
-        int numOfTasksB4 = tl.getTasksList().size();
+        int numOfTasksB4 = tl.getTaskElementList().size();
         int totalTasksDisplayedValB4 = tl.getTotalTasksDisplayVal();
         // select 'move to' option from actions menu
         if(!tl.selectTaskAction(taskIndex, "Move to"))
@@ -214,7 +219,7 @@ public class TaskActionsTest extends BaseTest {
         // select a tab
         String targetTabId = "list_" + tl.moveToTab();
         String targetTabName = tl.getTabNameById(targetTabId);
-        int actualNumOfTasks = tl.getTasksList().size();
+        int actualNumOfTasks = tl.getTaskElementList().size();
         int actualTotalTasksDisplayed = tl.getTotalTasksDisplayVal();
         // verify num of tasks in current tab reduced by 1
         Assert.assertEquals(actualNumOfTasks, numOfTasksB4-1, "Task: '" + taskToMoveName + "' was not moved to tab: '" + targetTabName +"'");
@@ -237,9 +242,8 @@ public class TaskActionsTest extends BaseTest {
     @Test
     public void tc09_delete_a_task() {
         tl = new TaskList(driver);
-        if(!tl.getCurrentTabId().equals(tabId))
-            tl.goToTabById(tabId);
-        int numOfTasksB4Delete = tl.getTasksList().size();
+        moveToTargetTab(tl, tabId);
+        int numOfTasksB4Delete = tl.getTaskElementList().size();
         int totalNumOfTasksDisplayValB4 = tl.getTotalTasksDisplayVal();
         // select last task from the list
         taskIndex = tl.getTasksList().size() - 1;
@@ -251,7 +255,7 @@ public class TaskActionsTest extends BaseTest {
         // cancel delete alarm
         tl.deleteTask(TaskList.AlertState.CANCEL);
         // verify task was not deleted
-        Assert.assertEquals(tl.getTasksList().size(), numOfTasksB4Delete, "num of tasks changed following task delete cancel\n");
+        Assert.assertEquals(tl.getTaskElementList().size(), numOfTasksB4Delete, "num of tasks changed following task delete cancel\n");
         Assert.assertTrue(tl.getTasksMap().containsKey(taskId), "task ' " + taskName + " was deleted although delete operation was canceled");
         // open actions menu and select 'Delete'
         if (!tl.selectTaskAction(taskIndex, "Delete"))
@@ -259,7 +263,7 @@ public class TaskActionsTest extends BaseTest {
         // confirm delete alarm
         tl.deleteTask(TaskList.AlertState.ACCEPT);
         // verify num of tasks reduced by 1
-        Assert.assertEquals(tl.getTasksList().size(), numOfTasksB4Delete-1, "Task was not deleted. Num of tasks in list did not change\n");
+        Assert.assertEquals(tl.getTaskElementList().size(), numOfTasksB4Delete-1, "Task was not deleted. Num of tasks in list did not change\n");
         int actualTotolDisplay = tl.getTotalTasksDisplayVal();
         // verify task total num display reduced by 1
         Assert.assertEquals(actualTotolDisplay, totalNumOfTasksDisplayValB4-1, "Total tasks value display did not change after deleting a task");
