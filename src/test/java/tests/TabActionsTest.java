@@ -23,7 +23,7 @@ public class TabActionsTest extends BaseTest {
         numOfTabsInSelectListBefore = tp.getTabElSelectList().size()-2;
         tabName = "rzf - new tab test";
         // tab creation action + cancel creation
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.CANCEL,null, null);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.CANCEL);
         if(!tabId.isEmpty())
             Assert.fail("tab is created although canceling tab creation action\n");
         // getting num of tabs in visible list after the cancelling tab creation
@@ -37,7 +37,7 @@ public class TabActionsTest extends BaseTest {
     @Test(description = "create a new tab and verify it was created and added in both visible and Select list")
     public void tc02_create_new_tab(){
         tp = new TasksPage(driver);
-        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT,null, null);
+        tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         tp = new TasksPage(driver);
         if(tabId.isEmpty())
             Assert.fail("failed to create a tab for testing");
