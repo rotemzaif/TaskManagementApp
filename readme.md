@@ -82,14 +82,24 @@ Setup & Prerequisites
 
 * make sure you have an internet connection
 
-Test Execution - there are 2 ways to execute the various tests
+Test Execution - there are 3 ways to execute the various tests
 1. executing each test separately
 
-2. executing the testing.xml (under project folder) file which will run all test classes 
+2. executing the testing.xml (under project folder) file which will run all test classes
+
+3. via command line with maven command:
+    * open command line window (cmd) and move to the project folder
+    * enter the following command: mvn clean test 
 
 Logs
 
+    * there is no log file
+    * all tests assertions have messages printed to console
+
 Reporting
+
+    * Allure reporting system
+    * in order to get the test run report: execute the following command after running the test suit via maven: mvn allure:serve
 
 Notes
 
