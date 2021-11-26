@@ -20,8 +20,8 @@
             <class name="tests.AddSimpleTaskTest">
                 <methods>
                     <include name="tc01_create_new_tab_for_testing"/>
-                    <include name="tc03_create_multiple_simple_tasks"/>
-                    <include name="tc04_verify_total_num_of_tasks_display"/>
+                    <include name="tc02_create_multiple_simple_tasks"/>
+                    <include name="tc03_verify_total_num_of_tasks_display"/>
                 </methods>
             </class>
             <class name="tests.AdvancedTaskPageTest">
