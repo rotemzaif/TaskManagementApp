@@ -19,19 +19,28 @@ public class SearchTaskTest extends BaseTest {
     @Test(description = "creating a new tab for testing text search in the task list")
     public void tc01_create_new_tab_for_testing() {
         tl = new TaskList(driver);
-        tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT, TasksPage.SortOption.HAND, TaskList.OptionState.UNSELECT);
-        tl = new TaskList(driver);
+        tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT);
         // verifying tab is created
         if(tabId.isEmpty())
             Assert.fail("failed to create a tab for testing");
+        tl = new TaskList(driver);
+        // verifying new tab is displayed
         Assert.assertTrue(tl.isTabExistInVisibleList(tabId), "tab id: \" + tabId + \" is created but not visible\\n");
+        // setting and verifying tab sort display - Sort by Hand
+        tl.goToTabById(tabId);
+        tl.openTabActionsMenu(tabId);
+        if (!tl.setTabSortDisplay(tabId, TasksPage.SortOption.HAND))
+            System.out.println("failed to set tab sort option 'Sort by hand'!! This might affect further tests results");
+        // setting testing tab 'Show completed tasks' - un-select (in case selected) for further testing purpose
+        tl.openTabActionsMenu(tabId);
+        if (!tl.setTabCompletedTasksDisplay(tabId, TasksPage.OptionState.UNSELECT))
+            System.out.println("failed to un-select 'Show completed tasks' option!! This might affect further tests results");
     }
-
 
     @Test(description = "adding simple and advanced tasks to the list which contain search keyword")
     public void tc02_add_tasks_to_tab(){
         tl = new TaskList(driver);
-        tl.goToTabById(tabId);
+        moveToTargetTab(tl, tabId);
         AdvancedTaskPage atp;
         for (Task task : getTasksToEnterList()) {
             if(task.getTaskName().contains("task") || task.getTaskNotes().contains("task"))
@@ -41,13 +50,14 @@ public class SearchTaskTest extends BaseTest {
             atp.submitTask(task);
             tl = new TaskList(driver);
         }
-        int actualTasksNum = tl.getTasksList().size();
+        int actualTasksNum = tl.getTaskElementList().size();
         Assert.assertEquals(actualTasksNum, getTasksToEnterList().size());
     }
 
     @Test(description = "entering keyword for search and verifying the result list and total num of tasks display")
     public void tc03_search_for_keyword(){
         tl = new TaskList(driver);
+        moveToTargetTab(tl, tabId);
         tl.searchText(textToSearch);
         tl = new TaskList(driver);
         List<Task> actualListAfterSearch = tl.getTasksList();
@@ -65,9 +75,10 @@ public class SearchTaskTest extends BaseTest {
     @Test(description = "removing the search keyword and verifying the original task list")
     public void tc04_remove_search_text(){
         tl = new TaskList(driver);
+        moveToTargetTab(tl, tabId);
         tl.closeSearch();
         tl = new TaskList(driver);
-        Assert.assertEquals(tl.getTasksList().size(), getTasksToEnterList().size(), "closing the text search doesn't display the original task list\n");
+        Assert.assertEquals(tl.getTaskElementList().size(), getTasksToEnterList().size(), "closing the text search doesn't display the original task list\n");
         Assert.assertEquals(tl.getTotalTasksDisplayVal(), getTasksToEnterList().size(), "incorrect total tasks display after closing the text search\n");
     }
 
