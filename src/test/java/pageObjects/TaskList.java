@@ -83,6 +83,11 @@ public class TaskList extends TasksPage {
 
     // task getter methods
 
+
+    public List<WebElement> getTaskElementList() {
+        return taskElementList;
+    }
+
     /**
      * @return a list of Task objects based on the tasks displayed in the list
      */
