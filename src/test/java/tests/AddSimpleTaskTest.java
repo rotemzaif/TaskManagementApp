@@ -5,7 +5,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import pageObjects.Task;
 import pageObjects.TaskList;
-import pageObjects.TasksPage;
 import utils.Utils;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class AddSimpleTaskTest extends BaseTest {
             tabId = tabsIdWithSameName.get(0);
         // there are no tabs with name 'rzf - tasks' --> creating a new tab + setting view settings
         else
-            tabId = tl.createNewTab2(tabName, TaskList.AlertState.ACCEPT);
+            tabId = tl.createNewTab(tabName, TaskList.AlertState.ACCEPT);
         tl = new TaskList(driver);
         // verifying tab is created
         if(tabId.isEmpty())
