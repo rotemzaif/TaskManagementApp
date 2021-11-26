@@ -23,6 +23,7 @@ public class DefectsTest extends BaseTest {
         tabId = tp.createNewTab(tabName, TasksPage.AlertState.ACCEPT);
         if(tabId.isEmpty())
             Assert.fail("tab '" + tabName + "' was not created!!\n");
+        tp = new TasksPage(driver);
         tp.goToTabById(tabId);
         String expectedTabName = "rzf - defects";
         String actualTabName = tp.getCurrentTabName();
