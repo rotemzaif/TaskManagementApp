@@ -213,32 +213,19 @@ public class TasksPage extends BasePage {
     // tab related actions
 
     /**
-     * @param tabName     - String
+     * this method creates a new tab based on given name and alert state accept/cancel
+     * @param tabName - String
      * @param allertState - enum ACCPET/CANCEL
-     * @param sortOption  - String
-     * @param sctSate     - enum SELECT/UNSELECT, sct - show completed tasks
-     * @return tabId - new tab Id - String
-     * @description method that creates a new tab (or cancels), sets tab sort option according to arg entered, and select/un-select
-     * 'Show completed tasks' according to state arg entered
+     * @return
      */
-    public String createNewTab(String tabName, AlertState allertState, SortOption sortOption, OptionState sctSate) {
+    public String createNewTab(String tabName, AlertState allertState){
         String tabId = "";
-        click(newTabBtn);
-        allertSendText(tabName);
-        if (allertState == AlertState.ACCEPT) {
+        click(newTabBtn); // clicking on the 'new tab' button
+        allertSendText(tabName); // entering new tab name
+        if (allertState == AlertState.ACCEPT){
             allertAccept();
             loading();
             tabId = tabElList.get(tabElList.size() - 1).getAttribute("id");
-            // set tab sort display
-            if(sortOption != null){
-                if (!setTabSortDisplay(tabId, sortOption))
-                    System.out.println("'" + sortOption + "' was not found in the tab action menu list!\n");
-            }
-            // set tab 'show completed tasks' state - select/un-select
-            if (sctSate != null) {
-                if (!setTabCompletedTasksDisplay(tabId, sctSate))
-                    System.out.println("'Show completed tasks' option was not found in the tab action menu list!\n");
-            }
         } else if (allertState == AlertState.CANCEL)
             allertcancel();
         return tabId;
